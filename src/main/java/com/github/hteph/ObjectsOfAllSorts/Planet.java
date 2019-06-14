@@ -1,9 +1,11 @@
 package com.github.hteph.ObjectsOfAllSorts;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.github.hteph.Utilities.enums.HydrosphereDescription;
 import com.github.hteph.Utilities.atmoCompositionComparator;
@@ -179,14 +181,8 @@ public class Planet extends OrbitalObjects {
 	}
 
 	public String getAtmosphericCompositionParsed() {
-		StringBuilder listOfGas=new StringBuilder();
 
-		for(AtmosphericGases next: atmosphericComposition) {
-
-			listOfGas.append(" "+next.toString());
-		}
-
-		return listOfGas.toString();
+		return atmosphericComposition.stream().map(AtmosphericGases::toString).collect(Collectors.joining(" " ) );
 	}
 
 	public void setAtmosphericComposition(Set<AtmosphericGases> atmosphericComposition) {
@@ -199,7 +195,7 @@ public class Planet extends OrbitalObjects {
 	}
 
 	public void setAtmoPressure(double atmoPressure) {
-		this.atmoPressure = BigDecimal.valueOf(atmoPressure).setScale(3);
+		this.atmoPressure = BigDecimal.valueOf(atmoPressure).setScale(3, RoundingMode.HALF_UP);
 	}
 
 	public double getSurfaceTemp() {
@@ -247,7 +243,7 @@ public class Planet extends OrbitalObjects {
 	}
 
 	public void setDayTempMod(double dayTempMod) {
-		this.dayTempMod = BigDecimal.valueOf(dayTempMod).setScale(3);
+		this.dayTempMod = BigDecimal.valueOf(dayTempMod).setScale(3, RoundingMode.HALF_UP);
 	}
 
 	public String getTectonicActivityGroup() {
@@ -312,10 +308,13 @@ public class Planet extends OrbitalObjects {
 	}
 
 	public void setLunarOrbitalPeriod(double lunarOrbitalPeriod) {
-		this.lunarOrbitalPeriod = BigDecimal.valueOf(lunarOrbitalPeriod).setScale(3);
+		this.lunarOrbitalPeriod = BigDecimal.valueOf(lunarOrbitalPeriod).setScale(3, RoundingMode.HALF_UP);
 	}
 
 	public void addLunarObjects(OrbitalObjects lunarObject) {
+
+		final int ASCII_STARTING_NUMBER = 97;
+		final int ASCII_ENDING_NUMBER = 122;
 
 		Set<OrbitalObjects> objectList = new TreeSet<>(new lunarObjectDistanceComparator());
 
@@ -323,17 +322,18 @@ public class Planet extends OrbitalObjects {
 		wipeMoons();
 		objectList.add(lunarObject);
 
-		Character asciiNumber = 97;
+		char asciiNumber = ASCII_STARTING_NUMBER;
 		for (OrbitalObjects moon:objectList){
 
 			String moonID = moon.getOrbitingAround().getArchiveID()
-					+"."+asciiNumber.toString()
-					+moon.getLocalOrbitDistance();
+					+ "."
+					+ asciiNumber
+					+ moon.getLocalOrbitDistance();
 			moonList.add(moonID);
 			moon.setArchiveID(moonID);
 			CentralRegistry.putInArchive(moon);
 			asciiNumber++;
-			if(asciiNumber>122)  asciiNumber=97;
+			if(asciiNumber>ASCII_ENDING_NUMBER)  asciiNumber=ASCII_STARTING_NUMBER;
 		}
 
 	}
@@ -343,7 +343,7 @@ public class Planet extends OrbitalObjects {
 	}
 
 	public void setLunarOrbitDistance(double lunarOrbitDistance) {
-		this.localOrbitDistance = BigDecimal.valueOf(lunarOrbitDistance).setScale(3);
+		this.localOrbitDistance = BigDecimal.valueOf(lunarOrbitDistance).setScale(3, RoundingMode.HALF_UP);
 	}
 
 

@@ -10,16 +10,16 @@ public class StarClassificationTable {
     private final static TreeMap<Integer, String> map = new TreeMap<>();
 
     static {
-        map.put(40000,"X");
-        map.put(28000, "O");
+        map.put(60000,"X");
+        map.put(30000, "O");
         map.put(10000, "B");
-        map.put(8000, "A");
+        map.put(7500, "A");
         map.put(6000, "F");
-        map.put(4900, "G");
-        map.put(3500, "K");
-        map.put(2000, "M");
+        map.put(5200, "G");
+        map.put(3700, "K");
+        map.put(2400, "M");
         map.put(1300, "L");
-        map.put(550, "T");
+        map.put(250, "T");
         map.put(0, "Y");
     }
 
@@ -27,8 +27,8 @@ public class StarClassificationTable {
 
         Integer baseTemp = map.floorKey(temperature);
         Integer topTemp = map.ceilingKey(temperature);
-        System.out.println(baseTemp +" to "+ topTemp);
-        int deciNumber =10 -(10*(temperature-baseTemp)/(map.ceilingKey(temperature)-baseTemp));
+        System.out.println("method:findStarClass ;"+baseTemp +" to "+ topTemp);
+        int deciNumber =10 -(10*(temperature-baseTemp)/(topTemp-baseTemp));
         return map.get(baseTemp)+ deciNumber;
     }
 
