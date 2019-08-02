@@ -1,6 +1,5 @@
 package com.github.hteph.Generators;
 
-import com.github.hteph.ObjectsOfAllSorts.OrbitalObjects;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.ObjectsOfAllSorts.StellarObject;
 import com.github.hteph.Tables.InnerObjectTable;
@@ -10,7 +9,6 @@ import com.github.hteph.Utilities.RomanNumber;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public final class StarSystemGenerator  {
 
@@ -88,7 +86,7 @@ public final class StarSystemGenerator  {
 				case 'j':
 					classificationName = "Gas Giant";
 					description = " A relatively small Gas Giant";
-					star.setOrbitalObjects(JovianGenerator.Generator(star.getArchiveID()+"."+numeral,
+					star.addOrbitalObjects(JovianGenerator.Generator(star.getArchiveID()+"."+numeral,
 																	 star.getName()+" "+numeral,
 																	 description,
 																	 classificationName,
@@ -100,7 +98,7 @@ public final class StarSystemGenerator  {
 				case 'J':
 					classificationName = "Super Jovian";
 					description = "A truly massive Gas Giant, dominating the whole system";
-					star.setOrbitalObjects(JovianGenerator.Generator(star.getArchiveID()+"."+numeral,
+					star.addOrbitalObjects(JovianGenerator.Generator(star.getArchiveID()+"."+numeral,
 																	 star.getName()+" "+numeral,
 																	 description,
 																	 classificationName,
@@ -112,9 +110,9 @@ public final class StarSystemGenerator  {
 				case 't':
 					classificationName = "Planetoid";
 					description = "Small and nicely rounded";
-					star.setOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
+					star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
 																			   star.getName()+" "+numeral,
-																			   description,classificationName,
+																			   description, classificationName,
 																			   orbitalDistancesArray[i],
 																			   orbitalObjectBasicList[i],
 																			   star,
@@ -124,9 +122,9 @@ public final class StarSystemGenerator  {
 				case 'T':
 					classificationName = "Terrestial";
 					description = "Large and round";
-					star.setOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
+					star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
 																			   star.getName()+" "+numeral,
-																			   description,classificationName,
+																			   description, classificationName,
 																			   orbitalDistancesArray[i],
 																			   orbitalObjectBasicList[i],
 																			   star,
@@ -136,9 +134,9 @@ public final class StarSystemGenerator  {
 				case 'C':
 					classificationName = "Catched Terrestial";
 					description = "Large and round, but from not originated in this system";
-					star.setOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
+					star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
 																			   star.getName()+" "+numeral,
-																			   description,classificationName,
+																			   description, classificationName,
 																			   orbitalDistancesArray[i],
 																			   orbitalObjectBasicList[i],
 																			   star,
@@ -146,7 +144,7 @@ public final class StarSystemGenerator  {
 					objectCounter++;
 					break;
 				case 'c': //TODO this should use a special generator to allow for strange stuff as hulks, ancient stations etc etc
-					star.setOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
+					star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID()+"."+numeral,
 																			   star.getName()+" " +numeral,
 																			   "Smaller than a planet, but not one of those asteroids, and not from here to start with",
 																			   "Catched object",
@@ -157,7 +155,7 @@ public final class StarSystemGenerator  {
 					objectCounter++;
 					break;
 				case 'A':
-					star.setOrbitalObjects(GenerateAsteroidBelt.Generator(star.getArchiveID()+".A"+i,
+					star.addOrbitalObjects(GenerateAsteroidBelt.Generator(star.getArchiveID()+".A"+i,
 																		  "Asterioidbelt "+astroidBeltCounter,
 																		  "A bunch of blocks",
 																		  i,

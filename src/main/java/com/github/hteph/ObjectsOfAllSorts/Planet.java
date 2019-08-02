@@ -345,6 +345,4 @@ public class Planet extends OrbitalObjects {
 	public void setLunarOrbitDistance(double lunarOrbitDistance) {
 		this.localOrbitDistance = BigDecimal.valueOf(lunarOrbitDistance).setScale(3, RoundingMode.HALF_UP);
 	}
-
-
 }

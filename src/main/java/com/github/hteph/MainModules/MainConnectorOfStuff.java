@@ -10,12 +10,7 @@ import com.github.hteph.ObjectsOfAllSorts.StellarObject;
 public class MainConnectorOfStuff {
 
 	public static void main(String[] args) throws IOException {
-		
-		
-		
-		
-		
-			
+
 		StellarObject testStar;
 
 			testStar = GenerateStar.Generator();

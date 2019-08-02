@@ -7,6 +7,7 @@ import com.github.hteph.Utilities.Dice;
 import com.github.hteph.Utilities.NameGenerator;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public final class GenerateStar {
@@ -43,14 +44,18 @@ public final class GenerateStar {
 		String description=" A star of "+starClass+" type";
 
         //TODO allow for multiple Starsystems, ie archiveID not hardcoded
-		return new Star("A", randomNameGenerator.compose(2+Dice.d6()/2),
-                        description,
-                        lumosity,
-						mass,
-						diameter,
-						starClass,
-						age,
-						abundance);
+
+		return Star.builder()
+            .withArchiveID("A")
+            .withName(randomNameGenerator.compose(2+Dice.d6()/2))
+            .withDescription(description)
+            .withLumosity(BigDecimal.valueOf(lumosity))
+            .withMass(BigDecimal.valueOf(mass))
+            .withDiameter(BigDecimal.valueOf(diameter))
+            .withClassification(starClass)
+            .withAge(BigDecimal.valueOf(abundance))
+            .withAbundance(abundance)
+            .build();
 	}
 
     private static int generateAbundance(double age) {

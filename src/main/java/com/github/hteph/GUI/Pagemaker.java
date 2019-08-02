@@ -479,8 +479,8 @@ public final class Pagemaker {
 
 		ListView<String> factList = new ListView<>();
 
-		ObservableList<String> starFacts = FXCollections.observableArrayList("Lumosity [Sol-eqv]: "+String.valueOf(star.getLumosity()),"Mass [Sol-eqv]: "
-				+String.valueOf(star.getMass()),"Diameter [Sol-eqv]: "+String.valueOf(star.getRadius()),"Age [Gy]: "
+		ObservableList<String> starFacts = FXCollections.observableArrayList("Lumosity [Sol-eqv]: "+String.valueOf(star.getLumosity()), "Mass [Sol-eqv]: "
+				+String.valueOf(star.getMass()), "Diameter [Sol-eqv]: "+String.valueOf(star.getDiameter()), "Age [Gy]: "
 						+String.valueOf(star.getAge()));
 
 		factList.setItems(starFacts);

@@ -14,7 +14,7 @@ public abstract class StellarObject implements Serializable{
 	//Constructor -------------------------------------------------------------
 
 	public StellarObject(String name, String description, String archiveID) {
-		super();
+
 		this.name = name;
 		this.description = description;
 		this.archiveID = archiveID;

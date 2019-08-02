@@ -28,7 +28,7 @@ public class StarClassificationTable {
         Integer baseTemp = map.floorKey(temperature);
         Integer topTemp = map.ceilingKey(temperature);
         System.out.println("method:findStarClass ;"+baseTemp +" to "+ topTemp);
-        int deciNumber =10 -(10*(temperature-baseTemp)/(topTemp-baseTemp));
+        int deciNumber = 10 -(10*(temperature-baseTemp)/(topTemp-baseTemp));
         return map.get(baseTemp)+ deciNumber;
     }
 
