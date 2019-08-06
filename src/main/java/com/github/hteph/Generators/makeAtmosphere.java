@@ -19,7 +19,6 @@ class makeAtmosphere {
                                                      double radius,
                                                      double gravity,
                                                      Planet planet) {
-
         Set<String> makeAtmoshpere = new TreeSet<>();
         TreeSet<AtmosphericGases> atmoArray = new TreeSet<>(new atmoCompositionComparator());
 

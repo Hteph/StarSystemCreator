@@ -1,6 +1,6 @@
 package com.github.hteph.GUI;
 
-import com.github.hteph.Generators.GenerateStar;
+import com.github.hteph.Generators.StarFactory;
 import com.github.hteph.Generators.StarSystemGenerator;
 import com.github.hteph.ObjectsOfAllSorts.CentralRegistry;
 import com.github.hteph.ObjectsOfAllSorts.Planet;
@@ -38,7 +38,7 @@ public class Main extends Application {
 			e2.printStackTrace();
 		}
 
-		StellarObject star =  GenerateStar.Generator();
+		StellarObject star =  StarFactory.generate();
 
 		ArrayList<StellarObject> systemList = StarSystemGenerator.Generator((Star) star);
 

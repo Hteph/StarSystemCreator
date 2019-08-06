@@ -10,14 +10,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-public final class GenerateStar {
+public final class StarFactory {
 
-	private GenerateStar() {
+	private StarFactory() {
 		//No instances should be created of this method
 	}
 
 	//Method --------------------------------------------------------------------
-	public static  StellarObject Generator() {
+	public static  StellarObject generate(String systemName, char systemPosition, Star star) {
 
 		NameGenerator randomNameGenerator = null;
         try {
@@ -45,15 +45,24 @@ public final class GenerateStar {
 
         //TODO allow for multiple Starsystems, ie archiveID not hardcoded
 
-		return Star.builder()
-            .withArchiveID("A")
-            .withName(randomNameGenerator.compose(2+Dice.d6()/2))
+
+        String starName = null;
+        try {
+            starName = randomNameGenerator.compose((int)(2+ Dice.d6()/2));
+        } catch (Exception e) {
+            starName = "Unknown";
+        }
+
+
+        return Star.builder()
+            .withArchiveID(systemName+" "+ Character.toString(systemPosition))
+            .withName(starName)
             .withDescription(description)
-            .withLumosity(BigDecimal.valueOf(lumosity))
-            .withMass(BigDecimal.valueOf(mass))
-            .withDiameter(BigDecimal.valueOf(diameter))
+            .withLumosity(lumosity)
+            .withMass(mass)
+            .withDiameter(diameter)
             .withClassification(starClass)
-            .withAge(BigDecimal.valueOf(abundance))
+            .withAge(abundance)
             .withAbundance(abundance)
             .build();
 	}

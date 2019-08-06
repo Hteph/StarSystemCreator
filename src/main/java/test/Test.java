@@ -1,7 +1,7 @@
 package test;
 
 import com.github.hteph.Generators.GenerateAsteroidBelt;
-import com.github.hteph.Generators.GenerateStar;
+import com.github.hteph.Generators.StarFactory;
 import com.github.hteph.ObjectsOfAllSorts.AsteroidBelt;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.ObjectsOfAllSorts.StellarObject;
@@ -13,7 +13,7 @@ public class Test {
 	public static void main(String[] args) {
 
 
-		StellarObject star = GenerateStar.Generator();
+		StellarObject star = StarFactory.generate();
 		
 		char[] orbitalObjectBasicList = {'A','t'};
 		

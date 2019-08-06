@@ -6,6 +6,7 @@ import java.util.Arrays;
 import com.github.hteph.ObjectsOfAllSorts.Jovian;
 import com.github.hteph.ObjectsOfAllSorts.OrbitalObjects;
 import com.github.hteph.ObjectsOfAllSorts.Star;
+import com.github.hteph.Tables.TableMaker;
 import com.github.hteph.Utilities.Dice;
 
 public final class JovianGenerator {
@@ -77,27 +78,26 @@ public final class JovianGenerator {
 		gasGiant.setAxialTilt(axialTilt);
 		gasGiant.setOrbitalInclination(orbitalInclination);
 
+//Rotational Period
 		double tidalForce = orbitingAround.getMass().doubleValue()*26640000/Math.pow(orbitDistance.doubleValue()*400,3);
-
 		rotationalPeriod = (Dice.d6()+Dice.d6()+8)*(1+0.1*(tidalForce*orbitingAround.getAge().doubleValue()-Math.pow(mass, 0.5)));
 		if(Dice.d6()<2) rotationalPeriod=Math.pow(rotationalPeriod,Dice.d6());
 
 		gasGiant.setRotationalPeriod(rotationalPeriod);
 //Magnetic field
-
 		int[] magneticMassArray = {0,50,200,500};
-		double[] magneticMassArrayMin = {0.1 , 0.25 , 0.5 , 1.5, 1.5 };
-		double[] magneticMassArrayMax = {1 , 1.5 , 3 , 25, 25 };
-		int retVal = Arrays.binarySearch(magneticMassArray, (int) mass);
-		if(retVal<0) retVal=-retVal-1;
-		magneticField = (magneticMassArrayMax[retVal]-magneticMassArrayMin[retVal])/10*Dice.d10();
-		gasGiant.setMagneticField(magneticField);
+		Double[] magneticMassArrayMin = {0.1 , 0.25 , 0.5 , 1.5, 1.5 };
+		Double[] magneticMassArrayMax = {1d , 1.5 , 3d , 25d, 25d };
 
+		magneticField = (TableMaker.makeRoll((int) mass,magneticMassArray,magneticMassArrayMax)
+								 - TableMaker.makeRoll((int) mass,magneticMassArray,magneticMassArrayMin))
+								/10
+								*Dice.d10();
+		gasGiant.setMagneticField(magneticField);
 //Temperature
 		baseTemperature = (int) (255/Math.sqrt((orbitDistance.doubleValue()/Math.sqrt(orbitingAround.getLumosity().doubleValue()))));
 		gasGiant.setBaseTemperature(baseTemperature);
 
 		return gasGiant;
 	}
-
 }

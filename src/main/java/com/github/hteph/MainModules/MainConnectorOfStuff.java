@@ -2,7 +2,7 @@ package com.github.hteph.MainModules;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import com.github.hteph.Generators.GenerateStar;
+import com.github.hteph.Generators.StarFactory;
 import com.github.hteph.Generators.StarSystemGenerator;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.ObjectsOfAllSorts.StellarObject;
@@ -13,7 +13,7 @@ public class MainConnectorOfStuff {
 
 		StellarObject testStar;
 
-			testStar = GenerateStar.Generator();
+			testStar = StarFactory.generate();
 
 		ArrayList<StellarObject> Test = StarSystemGenerator.Generator((Star) testStar);
 		

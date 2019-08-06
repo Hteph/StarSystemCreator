@@ -31,5 +31,4 @@ public class StarClassificationTable {
         int deciNumber = 10 -(10*(temperature-baseTemp)/(topTemp-baseTemp));
         return map.get(baseTemp)+ deciNumber;
     }
-
 }

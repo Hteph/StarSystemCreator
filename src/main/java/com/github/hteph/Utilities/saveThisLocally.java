@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-import com.github.hteph.Generators.GenerateStar;
+import com.github.hteph.Generators.StarFactory;
 import com.github.hteph.Generators.StarSystemGenerator;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.ObjectsOfAllSorts.StellarObject;
@@ -47,7 +47,7 @@ public class saveThisLocally {
 		} catch (FileNotFoundException e) { //If the file do not exist, create it and fill it with a new generated system.
 			
 			StellarObject star = null;
-			star = GenerateStar.Generator();
+			star = StarFactory.generate();
 			ArrayList<StellarObject> systemList = StarSystemGenerator.Generator((Star) star);
 			ArrayList<ArrayList<StellarObject>> testSystem = new ArrayList<>();
 
