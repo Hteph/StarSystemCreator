@@ -40,7 +40,7 @@ public final class Dice {
 		return (int)(1+Math.random()*10);
 	}
 
-	public static boolean _3d6(int lower, int upper){
+	public static boolean _3d6test(int lower, int upper){
 
 		int test = d6()+d6()+d6();
 
@@ -48,11 +48,15 @@ public final class Dice {
 
 	}
 
-	public static boolean _3d6(int lessThan){
+	public static boolean _3d6test(int lessThan){
 
 		int test = d6()+d6()+d6();
 
 		return test < lessThan;
 
+	}
+
+	public static int d20() {
+		return (int)(1+Math.random()*20);
 	}
 }

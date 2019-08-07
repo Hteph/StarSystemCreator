@@ -38,7 +38,7 @@ public class Main extends Application {
 			e2.printStackTrace();
 		}
 
-		StellarObject star =  StarFactory.generate();
+		StellarObject star =  StarFactory.generate("Main",'A',null);
 
 		ArrayList<StellarObject> systemList = StarSystemGenerator.Generator((Star) star);
 

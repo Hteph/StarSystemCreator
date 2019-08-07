@@ -1,7 +1,5 @@
 package com.github.hteph.Utilities.enums;
 
-import jdk.management.resource.internal.inst.WindowsAsynchronousFileChannelImplRMHooks;
-
 /**
  */
 public enum ClimatePref implements baseEnum{

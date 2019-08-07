@@ -8,11 +8,6 @@ import com.github.hteph.Tables.TableMaker;
 import com.github.hteph.Utilities.Dice;
 import com.github.hteph.Utilities.enums.*;
 
-import java.math.BigDecimal;
-import java.util.TreeMap;
-
-import static com.github.hteph.Utilities.enums.TrophicLevels.*;
-
 public class CreatureGenerator {
 
     private CreatureGenerator() {
@@ -54,14 +49,14 @@ public class CreatureGenerator {
         if(lifeform.getHabitat().equals(EnvironmentalEnum.EXOTIC)) bonus2 -=6;
 
 
-        if(Dice._3d6(16+bonus+bonus2)) {
+        if(Dice._3d6test(16+bonus+bonus2)) {
             lifeform.getBody().setBodySymmetry(Symmetry.BILATERAL);
             lifeform.getBody().setLimbSegments(new TableMaker().makeRoll(
                     Dice.d6(),
                     new int[]{1,2,6},
                     new Integer[]{1,2,Dice.d6()+2}));
 
-        } else if(Dice._3d6(16+bonus2)){
+        } else if(Dice._3d6test(16+bonus2)){
             int sides = Dice.d6()+2;
             switch(sides){
                 case 3: lifeform.getBody().setBodySymmetry(Symmetry.TRILATERAL);
@@ -91,7 +86,7 @@ public class CreatureGenerator {
     private static void gravityEffects(Sophont lifeform){
 
     double gravity =((Planet)(CentralRegistry.getFromArchive(lifeform.getHomeworld()))).getGravity().doubleValue();
-    int roll=Dice._3d6();
+    int roll=Dice._3d6test();
 
     if(gravity<0.7) {
         roll +=3;

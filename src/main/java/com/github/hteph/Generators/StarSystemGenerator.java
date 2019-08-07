@@ -69,9 +69,9 @@ public final class StarSystemGenerator  {
 				orbitalObjectBasicList[i]='+';
 				
 			}else if(orbitalDistancesArray[i].doubleValue()<snowLine){
-				if(orbitalObjectBasicList[i]=='-') orbitalObjectBasicList[i]=innerTable.findInnerObject(Dice._3d6());
+				if(orbitalObjectBasicList[i]=='-') orbitalObjectBasicList[i]=innerTable.findInnerObject(Dice._3d6test());
 			}else{
-				if(orbitalObjectBasicList[i]=='-') orbitalObjectBasicList[i]= outerTable.findOuterObject(Dice._3d6());
+				if(orbitalObjectBasicList[i]=='-') orbitalObjectBasicList[i]= outerTable.findOuterObject(Dice._3d6test());
 			}
 		}
 		

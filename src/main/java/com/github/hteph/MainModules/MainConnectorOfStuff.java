@@ -13,7 +13,7 @@ public class MainConnectorOfStuff {
 
 		StellarObject testStar;
 
-			testStar = StarFactory.generate();
+			testStar = StarFactory.generate("Test",'A', null);
 
 		ArrayList<StellarObject> Test = StarSystemGenerator.Generator((Star) testStar);
 		
@@ -23,8 +23,5 @@ public class MainConnectorOfStuff {
 		System.out.println(Test.get(i).toString());
 		i++;
 		}
-
-
 	}
-
 }

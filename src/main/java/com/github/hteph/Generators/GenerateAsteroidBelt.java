@@ -30,14 +30,14 @@ public final class GenerateAsteroidBelt {
         if (orbitalDistancesArray[orbitNumber].doubleValue() > snowLine) outerZone = true;
 
         //Eccentricity
-        eccentricity = (Dice.d6() - 1) * (Dice.d6() - 1) / (100 * Dice.d6());
+        eccentricity = ((Dice.d6() - 1) * (Dice.d6() - 1) )/ (100 * Dice.d6());
         belt.setEccentricity(eccentricity);
 
         if (!outerZone) {
-            density = 0.3 + (Dice.d6() + Dice.d6() - 2) * 0.127 / Math.pow(
+            density = 0.3 + (Dice._2d6() - 2) * 0.127 / Math.pow(
                     0.4 + (orbitalDistancesArray[orbitNumber].doubleValue() / Math.pow(orbitingAround.getLumosity().doubleValue(), 0.5)), 0.67);
         } else {
-            density = 0.3 + (Dice.d6() + Dice.d6() - 2) * 0.05;
+            density = 0.3 + (Dice._2d6() - 2) * 0.05;
         }
 
         // TODO the general type and composition of the belt can be further fleshed out
@@ -57,15 +57,15 @@ public final class GenerateAsteroidBelt {
         belt.setAsterioidBeltType(asterioidBeltType);
 
         int[] massArray = new int[]{0, 5, 7, 9, 11};
+        Integer[] massBaseArray = new Integer[]{0, 5, 7, 9, 11};
         int massMod = orbitingAround.getAbundance();
         if (outerZone) massMod += 2;
         if (orbitingAround.getAge().doubleValue() > 7) massMod -= 1;
-
         //TODO +2 from multiple star system
 
-        int massBase = Arrays.binarySearch(massArray, Dice._2d6() + massMod);
-        if (massBase < 0) massBase = -massBase - 1;
+        int massBase = TableMaker.makeRoll(Dice._2d6()+massMod,massArray,massBaseArray);
         belt.setMass((Dice.d10()) * Math.pow(10, 4 - massBase));
+
         double beltWitdth = 0;
         if (orbitalObjectBasicList[orbitNumber] == 'j' || orbitalObjectBasicList[orbitNumber] == 'J') {
             belt.setObjectClass("Planetary Ring");

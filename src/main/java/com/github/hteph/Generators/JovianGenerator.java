@@ -1,7 +1,6 @@
 package com.github.hteph.Generators;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 
 import com.github.hteph.ObjectsOfAllSorts.Jovian;
 import com.github.hteph.ObjectsOfAllSorts.OrbitalObjects;
@@ -49,7 +48,7 @@ public final class JovianGenerator {
 // size may not be all, but here it is set
 
 		if(orbitalObjectClass=='J') {
-			mass = 250*Dice._3d6()+Dice.d10()*100;
+			mass = 250*Dice._3d6test()+Dice.d10()*100;
 			radius = (int) (60000+(Dice.d10()-orbitingAround.getAge().doubleValue()/2.0)*2000);
 			gasGiant.setRadius(radius);
 			gasGiant.setMass(mass);

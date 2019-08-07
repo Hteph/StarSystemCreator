@@ -13,7 +13,7 @@ public class Test {
 	public static void main(String[] args) {
 
 
-		StellarObject star = StarFactory.generate();
+		StellarObject star = StarFactory.generate("Test",'A',null);
 		
 		char[] orbitalObjectBasicList = {'A','t'};
 		

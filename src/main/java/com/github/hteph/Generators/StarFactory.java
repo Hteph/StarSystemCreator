@@ -7,7 +7,6 @@ import com.github.hteph.Utilities.Dice;
 import com.github.hteph.Utilities.NameGenerator;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 public final class StarFactory {
@@ -78,7 +77,7 @@ public final class StarFactory {
 
     private static double generateMass() {
         double mass;
-        int testDice =Dice._3d6()-3;
+        int testDice =Dice._3d6test()-3;
         double randN =testDice/(15.0+Math.random()/10); //turning the dice roll into a continous sligthly skewed randomnumber.
         mass = 0.045/(0.001+Math.pow(randN,5)); // <-----------------------------------------MOST IMPORTANT STARTING POINT
         return mass;
