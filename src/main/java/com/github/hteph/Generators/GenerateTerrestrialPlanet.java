@@ -351,8 +351,10 @@ public final class GenerateTerrestrialPlanet {
         if (atmoMap.containsKey("CO2")) {
             if (atmoMap.get("CO2").getPercentageInAtmo() > oxygenMax) {
 
+            } else {
+
             }
-        })
+        }
 
 
         boolean substitutionMade = false;
