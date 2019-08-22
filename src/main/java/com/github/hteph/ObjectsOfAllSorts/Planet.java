@@ -308,8 +308,8 @@ public class Planet extends OrbitalObjects {
 		return lunarOrbitalPeriod;
 	}
 
-	public void setLunarOrbitalPeriod(double lunarOrbitalPeriod) {
-		this.lunarOrbitalPeriod = BigDecimal.valueOf(lunarOrbitalPeriod).setScale(3, RoundingMode.HALF_UP);
+	public void setLunarOrbitalPeriod(Double lunarOrbitalPeriod) {
+		if(lunarOrbitalPeriod !=null) this.lunarOrbitalPeriod = BigDecimal.valueOf(lunarOrbitalPeriod).setScale(3, RoundingMode.HALF_UP);
 	}
 
 	public void addLunarObjects(OrbitalObjects lunarObject) {

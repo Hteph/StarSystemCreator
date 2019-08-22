@@ -72,8 +72,7 @@ public final class GenerateTerrestrialPlanet {
                 moonsPlanet = (Planet) centralObject;
                 moonsPlanetMass = ((Planet) moonsPlanet).getMass().doubleValue();
                 moonsPlanetsRadii = ((Planet) moonsPlanet).getRadius();
-            }
-            if (centralObject instanceof Jovian) {
+            }else {
                 moonsPlanet = (Jovian) centralObject;
                 moonsPlanetMass = ((Jovian) centralObject).getMass();
                 moonsPlanetsRadii = ((Jovian) centralObject).getRadius();
@@ -97,7 +96,7 @@ public final class GenerateTerrestrialPlanet {
         if (orbitalObjectClass == 'm') {
             List<Integer> baseSizeList = Arrays.asList(1, 5, 10, 50, 100, 250, 500);
             TableMaker.makeRoll(Dice.d10(), baseSizeList);
-            if (moonsPlanet instanceof Planet) baseSize = (int) Math.min(baseSize, ((Planet) moonsPlanet).getRadius() / 2);
+            if (moonsPlanet instanceof Planet) baseSize = Math.min(baseSize, ((Planet) moonsPlanet).getRadius() / 8);
         }
 
         if (orbitalObjectClass == 't' || orbitalObjectClass == 'c') baseSize = 90;
@@ -114,14 +113,16 @@ public final class GenerateTerrestrialPlanet {
         mass = Math.pow(planet.getRadius() / 6380.0, 3) * density;
         gravity = mass / Math.pow((planet.getRadius() / 6380.0), 2);
 
-        if (orbitalObjectClass == 'm')
+        if (orbitalObjectClass == 'm'){
             lunarOrbitalPeriod = Math.sqrt(Math.pow((moonOrbit * moonsPlanetsRadii) / 400000, 3) * 793.64 / (moonsPlanetMass + mass));
+        }
         orbitalPeriod = Math.pow(Math.pow(orbitDistance.doubleValue(), 3) / orbitingAround.getMass().doubleValue(), 0.5); //in earth days
 
         planet.setMass(mass);
         planet.setDensity(density);
         planet.setGravity(gravity);
         planet.setOrbitalPeriod(orbitalPeriod);
+        planet.setLunarOrbitalPeriod(lunarOrbitalPeriod);
 
         //Eccentricity and Inclination
 
@@ -153,12 +154,17 @@ public final class GenerateTerrestrialPlanet {
         }
 
         if (orbitalObjectClass == 'm') {
-            moonTidal = moonsPlanetMass * 26640000 / 333000.0 / Math.pow(((Planet) moonsPlanet).getRadius() * moonOrbit * 400 / 149600000, 3);
+
+            int baseRadius;
+            if(moonsPlanet instanceof Planet) baseRadius = ((Planet) moonsPlanet).getRadius();
+            else baseRadius = ((Jovian) moonsPlanet).getRadius();
+
+            moonTidal = moonsPlanetMass * 26640000 / 333000.0 / Math.pow(baseRadius * moonOrbit * 400 / 149600000, 3);
             if (moonTidal > 1) planetLocked = true;
             planet.setPlanetLocked(true);
         } else {
             tidalForce = (orbitingAround.getMass().doubleValue() * 26640000 / Math.pow(orbitDistance.doubleValue() * 400, 3)) / (1 + sumOfLunarTidal);
-            tidelock = (0.83 + (Dice.d6() + Dice.d6() - 2) * 0.03) * tidalForce * orbitingAround.getAge().doubleValue() / 6.6;
+            tidelock = (0.83 + (Dice._2d6() - 2) * 0.03) * tidalForce * orbitingAround.getAge().doubleValue() / 6.6;
             if (tidelock > 1) {
                 tidelocked = true;
                 planet.wipeMoons(); //TODO Tidelocked planets generally can't have moon, but catched objects should be allowed?
@@ -271,7 +277,7 @@ public final class GenerateTerrestrialPlanet {
 
         if (lifeType.equals(Breathing.OXYGEN)) adjustForOxygen(atmoPressure.doubleValue(), atmoshericComposition);
 
-        albedo = findAlbedo(InnerZone, atmoPressure.doubleValue(), hydrosphere, hydrosphereDescription);
+        albedo = findAlbedo(InnerZone, atmoPressure.doubleValue(), hydrosphereDescription, planet);
         double greenhouseGasEffect = findGreenhouseGases(atmoshericComposition, atmoPressure.doubleValue());
 
         greenhouseFactor = 1 + Math.sqrt(atmoPressure.doubleValue()) * 0.01 * (Dice.d6() + Dice.d6() - 1) + Math.sqrt(greenhouseGasEffect) * 0.1
@@ -281,17 +287,9 @@ public final class GenerateTerrestrialPlanet {
         if (lifeType.equals(Breathing.OXYGEN) && baseTemperature > 350) greenhouseFactor *= 0.8;
         if (lifeType.equals(Breathing.OXYGEN) && baseTemperature < 250) greenhouseFactor *= 1.2;
 
-        // My take on the effect of greenhouse and albedo on temperature max planerary temp is 1000 and the half point is 400
-
-        if (hasGaia) surfaceTemp = 400 * (baseTemperature * albedo * greenhouseFactor) / (350 + baseTemperature * albedo * greenhouseFactor);
-        else if (atmoPressure.doubleValue() > 0)
-            surfaceTemp = 800 * (baseTemperature * albedo * greenhouseFactor) / (400 + baseTemperature * albedo * greenhouseFactor);
-        else surfaceTemp = 1200 * (baseTemperature * albedo * greenhouseFactor) / (800 + baseTemperature * albedo * greenhouseFactor);
-        ;
-
         planet.setAtmosphericComposition(atmoshericComposition);
         planet.setLifeType(lifeType);
-        planet.setSurfaceTemp((int) surfaceTemp);
+        planet.setSurfaceTemp(getSurfaceTemp(baseTemperature, atmoPressure, albedo, greenhouseFactor, hasGaia));
 
         //Climate -------------------------------------------------------
         // sets all the temperature stuff from axial tilt etc etc
@@ -300,12 +298,23 @@ public final class GenerateTerrestrialPlanet {
                                      hydrosphere,
                                      rotationalPeriod,
                                      axialTilt,
-                                     surfaceTemp,
+                                     planet.getSurfaceTemp(),
                                      orbitalPeriod); // sets all the temperature stuff from axial tilt etc etc
 
         //TODO Weather and day night temp cycle
         // and here we return the result
         return planet;
+    }
+
+    private static int getSurfaceTemp(int baseTemperature, BigDecimal atmoPressure, double albedo, double greenhouseFactor, boolean hasGaia) {
+
+        // My take on the effect of greenhouse and albedo on temperature max planerary temp is 1000 and the half point is 400
+        double surfaceTemp;
+        if (hasGaia) surfaceTemp = 400 * (baseTemperature * albedo * greenhouseFactor) / (350 + baseTemperature * albedo * greenhouseFactor);
+        else if (atmoPressure.doubleValue() > 0)
+            surfaceTemp = 800 * (baseTemperature * albedo * greenhouseFactor) / (400 + baseTemperature * albedo * greenhouseFactor);
+        else surfaceTemp = 1200 * (baseTemperature * albedo * greenhouseFactor) / (800 + baseTemperature * albedo * greenhouseFactor);
+        return (int) surfaceTemp;
     }
 
     // Inner methods -------------------------------------------------------------------------------------------------
@@ -520,7 +529,7 @@ public final class GenerateTerrestrialPlanet {
     }
 
 
-    private static double findAlbedo(boolean InnerZone, double atmoPressure, int hydrosphere, HydrosphereDescription hydrosphereDescription) {
+    private static double findAlbedo(boolean InnerZone, double atmoPressure, HydrosphereDescription hydrosphereDescription, Planet planet) {
 
         int mod = 0;
         int[] randAlbedoArray;
@@ -535,8 +544,8 @@ public final class GenerateTerrestrialPlanet {
             } else if (atmoPressure > 5) {
                 mod = -2;
             }
-            if (hydrosphere > 50 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) && mod > -2) mod = -2;
-            if (hydrosphere > 90 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) && mod > -4) mod = -4;
+            if (planet.getHydrosphere() > 50 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) && mod > -2) mod = -2;
+            if (planet.getHydrosphere() > 90 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) && mod > -4) mod = -4;
 
         } else {
             randAlbedoArray = new int[]{0, 4, 6, 8, 10};
