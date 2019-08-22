@@ -1,26 +1,23 @@
 package com.github.hteph.Utilities;
 
+import com.github.hteph.ObjectsOfAllSorts.AtmosphericGases;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
-import com.github.hteph.ObjectsOfAllSorts.AtmosphericGases;
+public class atmoCompositionComparator implements Comparator<AtmosphericGases>, Serializable {
 
-public class atmoCompositionComparator implements Comparator<AtmosphericGases>,Serializable{
-	 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7550070324501751233L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	@Override
+    @Override
     public int compare(AtmosphericGases gas1, AtmosphericGases gas2) {
-    	
-    	// Observe the sorting logic, higher percentage is sorted first
-    	
-        if(gas1.getPercentageInAtmo() > gas2.getPercentageInAtmo()){
-            return -1;
-        } else {
-            return 1;
-        }
+
+        // Observe the sorting logic, higher percentage is sorted first
+
+        return Integer.compare(gas2.getPercentageInAtmo(), gas1.getPercentageInAtmo());
     }
+
 }

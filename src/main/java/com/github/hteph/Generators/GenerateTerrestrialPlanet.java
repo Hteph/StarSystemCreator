@@ -6,7 +6,7 @@ import com.github.hteph.Tables.FindAtmoPressure;
 import com.github.hteph.Tables.TableMaker;
 import com.github.hteph.Tables.TectonicActivityTable;
 import com.github.hteph.Utilities.Dice;
-import com.github.hteph.Utilities.atmoCompositionComparator;
+import com.github.hteph.Utilities.enums.Breathing;
 import com.github.hteph.Utilities.enums.HydrosphereDescription;
 
 import java.math.BigDecimal;
@@ -44,7 +44,7 @@ public final class GenerateTerrestrialPlanet {
         HydrosphereDescription hydrosphereDescription;
         int hydrosphere;
         int waterVaporFactor;
-        TreeSet<AtmosphericGases> atmoshericComposition = new TreeSet<AtmosphericGases>(new atmoCompositionComparator());
+        TreeSet<AtmosphericGases> atmoshericComposition;
         BigDecimal atmoPressure;
         double albedo;
         double greenhouseFactor;
@@ -60,7 +60,7 @@ public final class GenerateTerrestrialPlanet {
         double moonsPlanetsRadii = 0;
 
         boolean hasGaia;
-        BREATHING lifeType;
+        Breathing lifeType;
         Star orbitingAround;
         double tidalForce = 0;
         double tidelock;
@@ -93,38 +93,16 @@ public final class GenerateTerrestrialPlanet {
         // size may not be all, but here it is set
         //TODO add greater varity for moon objects, depending on planet
 
-        int a = 900; //Default for planets
+        int baseSize = 900; //Default for planets
         if (orbitalObjectClass == 'm') {
-            switch (Dice.d10()) {
-                case 1:
-                    a = 1;
-                    break;
-                case 2:
-                    a = 5;
-                    break;
-                case 3:
-                    a = 10;
-                    break;
-                case 4:
-                    a = 50;
-                    break;
-                case 5:
-                    a = 100;
-                    break;
-                case 6:
-                    a = 500;
-                    break;
-
-                default:
-                    a = 250;
-                    break;
-            }
-            if (moonsPlanet instanceof Planet) a = (int) Math.min(a, ((Planet) moonsPlanet).getRadius() / 2);
+            List<Integer> baseSizeList = Arrays.asList(1, 5, 10, 50, 100, 250, 500);
+            TableMaker.makeRoll(Dice.d10(), baseSizeList);
+            if (moonsPlanet instanceof Planet) baseSize = (int) Math.min(baseSize, ((Planet) moonsPlanet).getRadius() / 2);
         }
 
-        if (orbitalObjectClass == 't' || orbitalObjectClass == 'c') a = 90;
-        radius = (Dice._2d6()) * a;
-        planet.setRadius(radius);
+        if (orbitalObjectClass == 't' || orbitalObjectClass == 'c') baseSize = 90;
+
+        planet.setRadius(Dice._2d6() * baseSize);
 
         //density
         if (orbitDistance.doubleValue() < snowLine) {
@@ -133,8 +111,8 @@ public final class GenerateTerrestrialPlanet {
         } else {
             density = 0.3 + (Dice._2d6() - 2) * 0.05;
         }
-        mass = Math.pow(radius / 6380.0, 3) * density;
-        gravity = mass / Math.pow((radius / 6380.0), 2);
+        mass = Math.pow(planet.getRadius() / 6380.0, 3) * density;
+        gravity = mass / Math.pow((planet.getRadius() / 6380.0), 2);
 
         if (orbitalObjectClass == 'm')
             lunarOrbitalPeriod = Math.sqrt(Math.pow((moonOrbit * moonsPlanetsRadii) / 400000, 3) * 793.64 / (moonsPlanetMass + mass));
@@ -250,7 +228,7 @@ public final class GenerateTerrestrialPlanet {
 
         //Hydrosphere
         hydrosphereDescription = findHydrosphereDescription(InnerZone, baseTemperature);
-        hydrosphere = findTheHydrosphere(hydrosphereDescription, radius);
+        hydrosphere = findTheHydrosphere(hydrosphereDescription, planet.getRadius());
         if (hydrosphereDescription.equals(HydrosphereDescription.LIQUID) || hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET)) {
             waterVaporFactor = Math.max(0, (baseTemperature - 240) / 100 * hydrosphere * (Dice._2d6() - 1));
         } else {
@@ -261,7 +239,12 @@ public final class GenerateTerrestrialPlanet {
         planet.setHydrosphere(hydrosphere);
 
         //Atmoshperic details
-        atmoshericComposition = makeAtmosphere.createPlanetary(orbitingAround, baseTemperature, tectonicActivityGroup, radius, gravity, planet);
+        atmoshericComposition = makeAtmosphere.createPlanetary(orbitingAround,
+                                                               baseTemperature,
+                                                               tectonicActivityGroup,
+                                                               planet.getRadius(),
+                                                               gravity,
+                                                               planet);
         atmoPressure = FindAtmoPressure.findAtmoPressure(tectonicActivityGroup, hydrosphere, planet.isBoilingAtmo(), mass, atmoshericComposition);
 
         // TODO Special considerations for c objects, this should be expanded upon when these gets more details
@@ -284,9 +267,9 @@ public final class GenerateTerrestrialPlanet {
         //Bioshpere
         hasGaia = testLife(baseTemperature, atmoPressure.doubleValue(), hydrosphere, atmoshericComposition);
         if (hasGaia) lifeType = findLifeType(atmoshericComposition);
-        else lifeType = BREATHING.NONE;
+        else lifeType = Breathing.NONE;
 
-        if (lifeType.equals(BREATHING.OXYGEN)) adjustForOxygen(atmoPressure.doubleValue(), atmoshericComposition);
+        if (lifeType.equals(Breathing.OXYGEN)) adjustForOxygen(atmoPressure.doubleValue(), atmoshericComposition);
 
         albedo = findAlbedo(InnerZone, atmoPressure.doubleValue(), hydrosphere, hydrosphereDescription);
         double greenhouseGasEffect = findGreenhouseGases(atmoshericComposition, atmoPressure.doubleValue());
@@ -295,8 +278,8 @@ public final class GenerateTerrestrialPlanet {
                                    + waterVaporFactor * 0.1;
 
         //TODO Here adding some Gaia moderation factor (needs tweaking probably) moving a bit more towards water/carbon ideal
-        if (lifeType.equals(BREATHING.OXYGEN) && baseTemperature > 350) greenhouseFactor *= 0.8;
-        if (lifeType.equals(BREATHING.OXYGEN) && baseTemperature < 250) greenhouseFactor *= 1.2;
+        if (lifeType.equals(Breathing.OXYGEN) && baseTemperature > 350) greenhouseFactor *= 0.8;
+        if (lifeType.equals(Breathing.OXYGEN) && baseTemperature < 250) greenhouseFactor *= 1.2;
 
         // My take on the effect of greenhouse and albedo on temperature max planerary temp is 1000 and the half point is 400
 
@@ -322,22 +305,20 @@ public final class GenerateTerrestrialPlanet {
 
         //TODO Weather and day night temp cycle
         // and here we return the result
-        return  planet;
+        return planet;
     }
 
     // Inner methods -------------------------------------------------------------------------------------------------
     private static double calcLunarTidal(Planet planetEffectOn, Planet planetEffectOf) {
-        double lunartidal =
-                planetEffectOf.getMass().doubleValue()
-                        * 26640000
-                        / 333000.0
-                        / Math.pow(planetEffectOn.getRadius()
-                                           * planetEffectOf.getLunarOrbitDistance().doubleValue()
-                                           * 400
-                                           / 149600000
-                        , 3);
 
-        return lunartidal;
+        return planetEffectOf.getMass().doubleValue()
+                       * 26640000
+                       / 333000.0
+                       / Math.pow(planetEffectOn.getRadius()
+                                          * planetEffectOf.getLunarOrbitDistance().doubleValue()
+                                          * 400
+                                          / 149600000
+                , 3);
     }
 
     private static void adjustForOxygen(double atmoPressure, TreeSet<AtmosphericGases> atmosphericComposition) {
@@ -346,75 +327,55 @@ public final class GenerateTerrestrialPlanet {
                                                         .stream()
                                                         .collect(Collectors.toMap(AtmosphericGases::getName, x -> x));
 
-        int oxygenMax = (int) (Dice._3d6() * 2 / atmoPressure);
+        int oxygenMax = Math.max(50, (int) (Dice._3d6() * 2 / atmoPressure)); //This could be a bit more involved and interesting
 
         if (atmoMap.containsKey("CO2")) {
             if (atmoMap.get("CO2").getPercentageInAtmo() > oxygenMax) {
+                AtmosphericGases co2 = atmoMap.get("CO2");
+                atmoMap.remove("CO2");
+                atmoMap.put("O2", AtmosphericGases.builder().withName("O2").withPercentageInAtmo(oxygenMax).build());
+                //perhaps the remnant CO should be put in as N2 instead?
+                atmoMap.put("CO2", AtmosphericGases.builder()
+                                                   .withName("CO2")
+                                                   .withPercentageInAtmo(co2.getPercentageInAtmo() - oxygenMax)
+                                                   .build());
 
             } else {
-
+                AtmosphericGases co2 = atmoMap.get("CO2");
+                atmoMap.remove("CO2");
+                atmoMap.put("O2", AtmosphericGases.builder().withName("O2").withPercentageInAtmo(co2.getPercentageInAtmo()).build());
             }
-        }
-
-
-        boolean substitutionMade = false;
-        ArrayList<AtmosphericGases> atmoList = new ArrayList<>(atmoshericComposition);
-        atmoshericComposition.clear();
-
-
-        for (int i = 0; i < atmoList.size(); i++) {
-            if (atmoList.get(i).getName().equals("CO2")) {
-                if (atmoList.get(i).getPercentageInAtmo() <= oxygenMax) {
-                    atmoList.add(AtmosphericGases.builder()
-                                                 .withName("O2")
-                                                 .withPercentageInAtmo(atmoList.get(i).getPercentageInAtmo())
-                                                 .build());
-                    atmoList.remove(atmoList.get(i));
-                    substitutionMade = true;
-
+        } else { //if no CO2 we just find the largest and take from that
+            AtmosphericGases gas = atmosphericComposition.pollFirst();
+            if (gas != null) {
+                if (gas.getPercentageInAtmo() < oxygenMax) {
+                    atmoMap.put("O2", AtmosphericGases.builder()
+                                                      .withName("O2")
+                                                      .withPercentageInAtmo(gas.getPercentageInAtmo())
+                                                      .build());
                 } else {
-                    atmoshericComposition.add(AtmosphericGases.builder()
-                                                              .withName("O2")
-                                                              .withPercentageInAtmo((int) oxygenMax)
-                                                              .build());
-                    atmoList.get(i).setPercentageInAtmo(atmoList.get(i).getPercentageInAtmo() - oxygenMax);
-                    substitutionMade = true;
+                    atmoMap.put("O2", AtmosphericGases.builder()
+                                                      .withName("O2")
+                                                      .withPercentageInAtmo(oxygenMax)
+                                                      .build());
+                    atmoMap.put(gas.getName(), AtmosphericGases.builder()
+                                                               .withName("O2")
+                                                               .withPercentageInAtmo(gas.getPercentageInAtmo() - oxygenMax)
+                                                               .build());
                 }
             }
         }
-
-        //if CO2 didn't exists take largest and use a piece of that
-        if (!substitutionMade) {
-
-            if (atmoshericComposition.first().getPercentageInAtmo() > oxygenMax) {
-                atmoshericComposition.add(AtmosphericGases.builder()
-                                                          .withName("O2")
-                                                          .withPercentageInAtmo(oxygenMax)
-                                                          .build());
-                atmoshericComposition
-                        .first()
-                        .setPercentageInAtmo(atmoshericComposition
-                                                     .first()
-                                                     .getPercentageInAtmo() - oxygenMax);
-            } else {
-                AtmosphericGases o2 = AtmosphericGases.builder()
-                                                      .withName("O2")
-                                                      .withPercentageInAtmo(atmoshericComposition.first().getPercentageInAtmo())
-                                                      .build();
-                atmoshericComposition.pollFirst();
-                atmoshericComposition.add(o2);
-            }
-        }
-        atmoshericComposition.addAll(atmoList);
+        atmosphericComposition.clear();
+        atmosphericComposition.addAll(atmoMap.values());
     }
 
-    private static BREATHING findLifeType(Set<AtmosphericGases> atmoshericComposition) {
+    private static Breathing findLifeType(Set<AtmosphericGases> atmoshericComposition) {
         //TODO Allow for alternate gases such as Cl2
         return atmoshericComposition.stream()
                                     .map(AtmosphericGases::getName)
                                     .anyMatch(b -> b.equals("NH3"))
-                       ? BREATHING.AMMONIA
-                       : BREATHING.OXYGEN;
+                       ? Breathing.AMMONIA
+                       : Breathing.OXYGEN;
 
 
     }
@@ -669,11 +630,4 @@ public final class GenerateTerrestrialPlanet {
         }
         return tempTectonics;
     }
-
-  private enum BREATHING{
-        NONE,
-      OXYGEN,
-      AMMONIA,
-      CHLORIDE;
-  }
 }

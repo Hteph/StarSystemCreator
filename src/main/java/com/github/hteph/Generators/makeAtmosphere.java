@@ -4,7 +4,6 @@ import com.github.hteph.ObjectsOfAllSorts.AtmosphericGases;
 import com.github.hteph.ObjectsOfAllSorts.Planet;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.Utilities.Dice;
-import com.github.hteph.Utilities.atmoCompositionComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +19,7 @@ class makeAtmosphere {
                                                      double gravity,
                                                      Planet planet) {
         Set<String> makeAtmoshpere = new TreeSet<>();
-        TreeSet<AtmosphericGases> atmoArray = new TreeSet<>(new atmoCompositionComparator());
+        TreeSet<AtmosphericGases> atmoArray = new TreeSet<>(new AtmosphericGases.atmoCompositionComparator());
 
         if (baseTemperature > 400) {
             makeHot(tectonicActivityGroup, makeAtmoshpere);

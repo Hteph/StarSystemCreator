@@ -7,8 +7,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import com.github.hteph.Generators.GenerateTerrestrialPlanet;
+import com.github.hteph.Utilities.enums.Breathing;
 import com.github.hteph.Utilities.enums.HydrosphereDescription;
-import com.github.hteph.Utilities.atmoCompositionComparator;
 import com.github.hteph.Utilities.lunarObjectDistanceComparator;
 
 public class Planet extends OrbitalObjects {
@@ -27,7 +28,7 @@ public class Planet extends OrbitalObjects {
 	private BigDecimal magneticField;
 	private HydrosphereDescription hydrosphereDescription;
 	private int hydrosphere;
-	private Set<AtmosphericGases> atmosphericComposition = new TreeSet<>(new atmoCompositionComparator());
+	private Set<AtmosphericGases> atmosphericComposition = new TreeSet<>(new AtmosphericGases.atmoCompositionComparator());
 	private BigDecimal atmoPressure;
 	private int surfaceTemp;
 	private int[] rangeBandTemperature =new int[10];
@@ -45,7 +46,7 @@ public class Planet extends OrbitalObjects {
 	private BigDecimal lunarOrbitalPeriod;
 //	private BigDecimal lunarOrbitDistance; //in planetRadii
 	private String classificationName;
-	private String lifeType;
+	private Breathing lifeType;
 
 	// Constructor ----------------------------------------------
 	public Planet(String archiveID, String name, String description, String classificationName, BigDecimal orbitDistance, StellarObject orbitingAround) {
@@ -84,7 +85,7 @@ public class Planet extends OrbitalObjects {
 		this.mass = BigDecimal.valueOf(mass).setScale(3,BigDecimal.ROUND_HALF_UP);
 	}
 
-	public double getRadius() {
+	public int getRadius() {
 		return radius;
 	}
 
@@ -262,11 +263,11 @@ public class Planet extends OrbitalObjects {
 		this.orbitalInclination = BigDecimal.valueOf(orbitalInclination).setScale(3,BigDecimal.ROUND_HALF_UP);
 	}
 
-	public String getLifeType() {
+	public Breathing getLifeType() {
 		return lifeType;
 	}
 
-	public void setLifeType(String lifeType) {
+	public void setLifeType(Breathing lifeType) {
 		this.lifeType = lifeType;
 	}
 
@@ -335,7 +336,6 @@ public class Planet extends OrbitalObjects {
 			asciiNumber++;
 			if(asciiNumber>ASCII_ENDING_NUMBER)  asciiNumber=ASCII_STARTING_NUMBER;
 		}
-
 	}
 
 	public BigDecimal getLunarOrbitDistance() {
