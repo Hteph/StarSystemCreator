@@ -326,7 +326,7 @@ public final class GenerateTerrestrialPlanet {
                        / Math.pow(planetEffectOn.getRadius()
                                           * planetEffectOf.getLunarOrbitDistance().doubleValue()
                                           * 400
-                                          / 149600000
+                                          / 149600000.0
                 , 3);
     }
 
