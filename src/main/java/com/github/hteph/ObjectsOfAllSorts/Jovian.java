@@ -3,6 +3,7 @@ package com.github.hteph.ObjectsOfAllSorts;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import com.github.hteph.Utilities.enums.Breathing;
 import com.github.hteph.Utilities.numberUtilities;
 
 public class Jovian extends OrbitalObjects {
@@ -14,7 +15,6 @@ public class Jovian extends OrbitalObjects {
 	private static final long serialVersionUID = 1L;
 
 	private int radius;
-
 	private int mass;
 	private double orbitalPeriod; //in earth years
 	private double axialTilt;
@@ -26,7 +26,7 @@ public class Jovian extends OrbitalObjects {
 	private int baseTemperature;
 
 	private double orbitalInclination;
-	String lifeType;
+	private Breathing lifeType;
 	private ArrayList<StellarObject> lunarObjects;
 	
 
@@ -113,14 +113,13 @@ public class Jovian extends OrbitalObjects {
 		this.orbitalInclination = orbitalInclination;
 	}
 
-	public String getLifeType() {
+	public Breathing getLifeType() {
 		return lifeType;
 	}
 
-	public void setLifeType(String lifeType) {
+	public void setLifeType(Breathing lifeType) {
 		this.lifeType = lifeType;
 	}
-
 
 
 	public void setMass(double mass) {
@@ -128,38 +127,23 @@ public class Jovian extends OrbitalObjects {
 		
 	}
 
-
-
 	public String getClassificationName() {
 		return classificationName;
 	}
-
-
 
 	public ArrayList<StellarObject> getLunarObjects() {
 		return lunarObjects;
 	}
 
-
-
 	public void setLunarObjects(ArrayList<StellarObject> lunarObjects) {
 		this.lunarObjects = lunarObjects;
 	}
-
-
 
 	public void setMass(int mass) {
 		this.mass = mass;
 	}
 
-
-
 	public void setClassificationName(String classificationName) {
 		this.classificationName = classificationName;
 	}
-
-
-
-
-
 }
