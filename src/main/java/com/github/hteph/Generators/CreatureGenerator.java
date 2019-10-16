@@ -49,14 +49,14 @@ public class CreatureGenerator {
         if(lifeform.getHabitat().equals(EnvironmentalEnum.EXOTIC)) bonus2 -=6;
 
 
-        if(Dice._3d6test(16+bonus+bonus2)) {
+        if(Dice._3d6lessThan(16+bonus+bonus2)) {
             lifeform.getBody().setBodySymmetry(Symmetry.BILATERAL);
-            lifeform.getBody().setLimbSegments(new TableMaker().makeRoll(
+            lifeform.getBody().setLimbSegments(TableMaker.makeRoll(
                     Dice.d6(),
                     new int[]{1,2,6},
                     new Integer[]{1,2,Dice.d6()+2}));
 
-        } else if(Dice._3d6test(16+bonus2)){
+        } else if(Dice._3d6lessThan(16+bonus2)){
             int sides = Dice.d6()+2;
             switch(sides){
                 case 3: lifeform.getBody().setBodySymmetry(Symmetry.TRILATERAL);
@@ -69,7 +69,7 @@ public class CreatureGenerator {
                     lifeform.getBody().setBodySymmetry(Symmetry.RADIAL);
                     break;
             }
-            lifeform.getBody().setLimbSegments(new TableMaker().makeRoll(
+            lifeform.getBody().setLimbSegments(TableMaker.makeRoll(
                     Dice._2d6(),
                     new int[]{2,6,10},
                     new Integer[]{1,2,Dice.d6()+2}));
@@ -78,15 +78,13 @@ public class CreatureGenerator {
             lifeform.getBody().setLimbSegments(0);
         }
 
-
-
         return lifeform;
     }
 
     private static void gravityEffects(Sophont lifeform){
 
     double gravity =((Planet)(CentralRegistry.getFromArchive(lifeform.getHomeworld()))).getGravity().doubleValue();
-    int roll=Dice._3d6test();
+    int roll=Dice._3d6();
 
     if(gravity<0.7) {
         roll +=3;
@@ -120,8 +118,7 @@ public class CreatureGenerator {
         if(lifeform.hasAttribute("Ergivore")) bonus -=2;
         if(lifeform.hasAttribute("Flier")) bonus +=1;
 
-        String choice=new TableMaker()
-                .makeRoll(
+        String choice=TableMaker.makeRoll(
                         Dice.d6()+bonus,
                         new int[]{0, 2, 4, 6},
                         new String[]{"Slow Metabolism", "Cold Blooded", "Warm Blooded", "Hyperactive"}

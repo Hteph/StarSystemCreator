@@ -2,7 +2,7 @@ package com.github.hteph.Generators;
 
 import java.math.BigDecimal;
 
-import com.github.hteph.ObjectsOfAllSorts.Jovian;
+import com.github.hteph.ObjectsOfAllSorts.*;
 import com.github.hteph.ObjectsOfAllSorts.OrbitalObjects;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.Tables.TableMaker;
@@ -36,13 +36,14 @@ public final class JovianGenerator {
 // size may not be all, but here it is set
 
 		if(orbitalObjectClass=='J') {
-			gasGiant.setMass(250*Dice._3d6()+Dice.d10()*100);
-            gasGiant.setRadius( (int) (60000+(Dice.d10()-orbitingAround.getAge().doubleValue()/2.0)*2000));
-		} else {
-            double snowLine = 5 * sqrt(orbitingAround.getLumosity().doubleValue());
-            double density;
-			gasGiant.setRadius((Dice._2d6())*7000);
-			if(orbitDistance.doubleValue()<snowLine) density = 0.1*Dice.d10()*0.025;
+			mass = 250*Dice._3d6()+Dice.d10()*100;
+			radius = (int) (60000+(Dice.d10()-orbitingAround.getAge().doubleValue()/2.0)*2000);
+			gasGiant.setRadius(radius);
+			gasGiant.setMass(mass);
+		}
+		else {
+			radius = (Dice._2d6())*7000;
+			if(InnerZone) density = 0.1*Dice.d10()*0.025;
 			else density = 0.08*Dice.d10()*0.025;
 			gasGiant.setMass((int) cubed(gasGiant.getRadius()/6380.0)*density);
 		}

@@ -361,12 +361,12 @@ public final class GenerateTerrestrialPlanet {
     private static double calcLunarTidal(Planet planetEffectOn, Planet planetEffectOf) {
 
         return planetEffectOf.getMass().doubleValue()
-               * 26640000
-               / 333000.0
-               / Math.pow(planetEffectOn.getRadius()
-                          * planetEffectOf.getLunarOrbitDistance().doubleValue()
-                          * 400
-                          / 149600000
+                       * 26640000
+                       / 333000.0
+                       / Math.pow(planetEffectOn.getRadius()
+                                          * planetEffectOf.getLunarOrbitDistance().doubleValue()
+                                          * 400
+                                          / 149600000.0
                 , 3);
     }
 

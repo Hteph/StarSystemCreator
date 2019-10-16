@@ -3,9 +3,9 @@ package com.github.hteph.MainModules;
 import java.io.IOException;
 import java.util.ArrayList;
 import com.github.hteph.Generators.StarFactory;
-import com.github.hteph.Generators.StarSystemGenerator;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.ObjectsOfAllSorts.StellarObject;
+import com.github.hteph.Generators.*;
 
 public class MainConnectorOfStuff {
 
