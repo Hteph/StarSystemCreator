@@ -6,6 +6,7 @@ import com.github.hteph.Tables.FindAtmoPressure;
 import com.github.hteph.Tables.TableMaker;
 import com.github.hteph.Tables.TectonicActivityTable;
 import com.github.hteph.Utilities.Dice;
+import com.github.hteph.Utilities.NumberUtilities;
 import com.github.hteph.Utilities.enums.Breathing;
 import com.github.hteph.Utilities.enums.HydrosphereDescription;
 
@@ -15,6 +16,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
+import static com.github.hteph.Utilities.NumberUtilities.*;
+
 public final class GenerateTerrestrialPlanet {
 
 
@@ -23,11 +26,17 @@ public final class GenerateTerrestrialPlanet {
     }
 
 
-    public static OrbitalObjects Generator(String archiveID, String name, String description, String classificationName, BigDecimal orbitDistance, char orbitalObjectClass, StellarObject centralObject, double lunarOrbitDistance) {
+    public static OrbitalObjects Generator(String archiveID,
+                                           String name,
+                                           String description,
+                                           String classificationName,
+                                           BigDecimal orbitDistance,
+                                           char orbitalObjectClass,
+                                           StellarObject centralObject,
+                                           double lunarOrbitDistance) {
 
         //Last parameter (lunarOrbitDistance) is only used if this is a moon to be created
         double mass;
-        int radius;
         double gravity;
         double density;
         double orbitalPeriod; //in earth years
@@ -48,7 +57,6 @@ public final class GenerateTerrestrialPlanet {
         BigDecimal atmoPressure;
         double albedo;
         double greenhouseFactor;
-        double surfaceTemp;
         boolean InnerZone = false;
         String tectonicActivityGroup;
         double orbitalInclination;
@@ -67,12 +75,12 @@ public final class GenerateTerrestrialPlanet {
         double sumOfLunarTidal = 0;
 
         //Ugly hack to be able to reuse this method for generating moons
-        if (orbitalObjectClass == 'm') {
+        if (String.valueOf(orbitalObjectClass).equalsIgnoreCase("m")) {
             if (centralObject instanceof Planet) {
                 moonsPlanet = (Planet) centralObject;
                 moonsPlanetMass = ((Planet) moonsPlanet).getMass().doubleValue();
                 moonsPlanetsRadii = ((Planet) moonsPlanet).getRadius();
-            }else {
+            } else {
                 moonsPlanet = (Jovian) centralObject;
                 moonsPlanetMass = ((Jovian) centralObject).getMass();
                 moonsPlanetsRadii = ((Jovian) centralObject).getRadius();
@@ -84,39 +92,41 @@ public final class GenerateTerrestrialPlanet {
         } else orbitingAround = (Star) centralObject;
 
         Planet planet = new Planet(archiveID, name, description, classificationName, orbitDistance, orbitingAround);
-        if (orbitalObjectClass == 'm') planet.setLunarOrbitDistance(lunarOrbitDistance);
+        if (String.valueOf(orbitalObjectClass).equalsIgnoreCase("m")) planet.setLunarOrbitDistance(lunarOrbitDistance);
 
-        double snowLine = 5 * Math.pow(orbitingAround.getLumosity().doubleValue(), 0.5);
+        double snowLine = 5 * sqrt(orbitingAround.getLumosity().doubleValue());
         if (orbitDistance.doubleValue() < snowLine) InnerZone = true;
 
         // size may not be all, but here it is set
         //TODO add greater varity for moon objects, depending on planet
 
         int baseSize = 900; //Default for planets
-        if (orbitalObjectClass == 'm') {
-            List<Integer> baseSizeList = Arrays.asList(1, 5, 10, 50, 100, 250, 500);
+        if (orbitalObjectClass == 'M') {
+            List<Integer> baseSizeList = Arrays.asList(100, 200, 300, 400, 500, 600, 700);
             TableMaker.makeRoll(Dice.d10(), baseSizeList);
             if (moonsPlanet instanceof Planet) baseSize = Math.min(baseSize, ((Planet) moonsPlanet).getRadius() / 8);
-        }
-
-        if (orbitalObjectClass == 't' || orbitalObjectClass == 'c') baseSize = 90;
+        }else if(orbitalObjectClass == 'm'){
+            List<Integer> baseSizeList = Arrays.asList(1, 5, 10, 20, 30, 40, 50);
+            TableMaker.makeRoll(Dice.d10(), baseSizeList);
+            if (moonsPlanet instanceof Planet) baseSize = Math.min(baseSize, ((Planet) moonsPlanet).getRadius() / 8);
+    }else if (orbitalObjectClass == 't' || orbitalObjectClass == 'c') baseSize = 90;
 
         planet.setRadius(Dice._2d6() * baseSize);
 
         //density
         if (orbitDistance.doubleValue() < snowLine) {
             density = 0.3 + (Dice._2d6() - 2) * 0.127 / Math.pow(
-                    0.4 + (orbitDistance.doubleValue() / Math.pow(orbitingAround.getLumosity().doubleValue(), 0.5)), 0.67);
+                    0.4 + (orbitDistance.doubleValue() / sqrt(orbitingAround.getLumosity().doubleValue())), 0.67);
         } else {
             density = 0.3 + (Dice._2d6() - 2) * 0.05;
         }
-        mass = Math.pow(planet.getRadius() / 6380.0, 3) * density;
-        gravity = mass / Math.pow((planet.getRadius() / 6380.0), 2);
+        mass = cubed(planet.getRadius() / 6380.0) * density;
+        gravity = mass / squared((planet.getRadius() / 6380.0));
 
-        if (orbitalObjectClass == 'm'){
-            lunarOrbitalPeriod = Math.sqrt(Math.pow((moonOrbit * moonsPlanetsRadii) / 400000, 3) * 793.64 / (moonsPlanetMass + mass));
+        if (orbitalObjectClass == 'm') {
+            lunarOrbitalPeriod = sqrt(cubed((moonOrbit * moonsPlanetsRadii) / 400000) * 793.64 / (moonsPlanetMass + mass));
         }
-        orbitalPeriod = Math.pow(Math.pow(orbitDistance.doubleValue(), 3) / orbitingAround.getMass().doubleValue(), 0.5); //in earth days
+        orbitalPeriod = sqrt(cubed(orbitDistance.doubleValue()) / orbitingAround.getMass().doubleValue()); //in earth days
 
         planet.setMass(mass);
         planet.setDensity(density);
@@ -128,15 +138,15 @@ public final class GenerateTerrestrialPlanet {
 
         int eccentryMod = 1;
         if (orbitalObjectClass == 'C' || orbitalObjectClass == 'c') eccentryMod += 3;
-        eccentricity = eccentryMod * (Dice.d6() - 1) * (Dice.d6() - 1) / (100 * Dice.d6());
-        axialTilt = (int) (10 * Dice._3d6() / 2 * Math.random());
-        orbitalInclination = eccentryMod * (Dice._2d6()) / (1 + mass / 10);
+        eccentricity = eccentryMod * (Dice._2d6() - 2) / (100.0 * Dice.d6());
+        axialTilt = (int) (10 * Dice._3d6() / 2.0 * Math.random());
+        orbitalInclination = eccentryMod * (Dice._2d6()) / (1.0 + mass / 10.0);
         planet.setAxialTilt(axialTilt);
         planet.setOrbitalInclination(orbitalInclination);
 
-        // TODO tidelocked or not should take into consideration moons too, generate moons here!
+        // TODO tidelocked or not should take into consideration moons too!
 
-        if (!(orbitalObjectClass == 'm')) GenerateMoon.createMoons(planet, InnerZone);
+        if (!String.valueOf(orbitalObjectClass).equalsIgnoreCase("m")) GenerateMoon.createMoons(planet, InnerZone);
 
         if (planet.getLunarObjects().size() > 0) {
             double[] lunartidal = new double[planet.getLunarObjects().size()];
@@ -156,18 +166,20 @@ public final class GenerateTerrestrialPlanet {
         if (orbitalObjectClass == 'm') {
 
             int baseRadius;
-            if(moonsPlanet instanceof Planet) baseRadius = ((Planet) moonsPlanet).getRadius();
+            if (moonsPlanet instanceof Planet) baseRadius = ((Planet) moonsPlanet).getRadius();
             else baseRadius = ((Jovian) moonsPlanet).getRadius();
 
             moonTidal = moonsPlanetMass * 26640000 / 333000.0 / Math.pow(baseRadius * moonOrbit * 400 / 149600000, 3);
             if (moonTidal > 1) planetLocked = true;
             planet.setPlanetLocked(true);
         } else {
-            tidalForce = (orbitingAround.getMass().doubleValue() * 26640000 / Math.pow(orbitDistance.doubleValue() * 400, 3)) / (1 + sumOfLunarTidal);
+            tidalForce = (orbitingAround.getMass().doubleValue() * 26640000 / cubed(orbitDistance.doubleValue() * 400))
+                         / (1.0 + sumOfLunarTidal);
             tidelock = (0.83 + (Dice._2d6() - 2) * 0.03) * tidalForce * orbitingAround.getAge().doubleValue() / 6.6;
             if (tidelock > 1) {
                 tidelocked = true;
-                planet.wipeMoons(); //TODO Tidelocked planets generally can't have moon, but catched objects should be allowed?
+                planet.wipeMoons(); //TODO Tidelocked planets generally can't have moon, but catched objects should
+                // be allowed?
             }
         }
 
@@ -177,7 +189,11 @@ public final class GenerateTerrestrialPlanet {
         } else if (planetLocked) {
             rotationalPeriod = lunarOrbitalPeriod;
         } else {
-            rotationalPeriod = (Dice.d6() + Dice.d6() + 8) * (1 + 0.1 * (tidalForce * orbitingAround.getAge().doubleValue() - Math.pow(mass, 0.5)));
+            rotationalPeriod = (Dice.d6() + Dice.d6() + 8) * (1 + 0.1 * (tidalForce * orbitingAround.getAge()
+                                                                                                    .doubleValue() -
+                                                                         Math.pow(
+                                                                                 mass,
+                                                                                 0.5)));
             if (Dice.d6() < 2) rotationalPeriod = Math.pow(rotationalPeriod, Dice.d6());
 
             if (rotationalPeriod > orbitalPeriod / 2.0) {
@@ -191,7 +207,9 @@ public final class GenerateTerrestrialPlanet {
                     eccentricity = eccentricityEffect[-resultResonance - 2];
                     rotationalPeriod = resonanceArray[-resultResonance - 2];
                 } else {
-                    resultResonance = Math.min(resultResonance, 6); //TODO there is somethng fishy here, Edge case of greater than 0.87 relation still causes problem Should rethink methodology
+                    resultResonance = Math.min(resultResonance,
+                                               6); //TODO there is somethng fishy here, Edge case of greater than
+                    // 0.87 relation still causes problem Should rethink methodology
                     eccentricity = eccentricityEffect[resultResonance];
                     rotationalPeriod = resonanceArray[-resultResonance];
                 }
@@ -217,8 +235,11 @@ public final class GenerateTerrestrialPlanet {
 
         //Magnetic field
         if (tectonicCore.contains("metal")) {
-            magneticField =
-                    10 / (Math.sqrt((rotationalPeriod / 24.0))) * Math.pow(density, 2) * Math.sqrt(mass) / orbitingAround.getAge().doubleValue();
+            magneticField = 10
+                            / (sqrt((rotationalPeriod / 24.0)))
+                            * squared(density)
+                            * sqrt(mass)
+                            / orbitingAround.getAge().doubleValue();
             if (tectonicCore.contains("small")) magneticField *= 0.5;
             if (tectonicCore.contains("medium")) magneticField *= 0.75;
             if (tectonicActivityGroup.equals("Dead")) magneticField = Dice.d6() / 15.0;
@@ -228,14 +249,15 @@ public final class GenerateTerrestrialPlanet {
         planet.setMagneticField(magneticField);
 
         //Temperature
-        baseTemperature = (int) (255 / Math.sqrt((orbitDistance.doubleValue() / Math.sqrt(orbitingAround.getLumosity().doubleValue()))));
+        baseTemperature = (int) (255 / sqrt((orbitDistance.doubleValue() / sqrt(orbitingAround.getLumosity().doubleValue()))));
 
         //base temp is an value of little use beyond this generator and is not propagated to the planet object
 
         //Hydrosphere
         hydrosphereDescription = findHydrosphereDescription(InnerZone, baseTemperature);
         hydrosphere = findTheHydrosphere(hydrosphereDescription, planet.getRadius());
-        if (hydrosphereDescription.equals(HydrosphereDescription.LIQUID) || hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET)) {
+        if (hydrosphereDescription.equals(HydrosphereDescription.LIQUID) || hydrosphereDescription.equals(
+                HydrosphereDescription.ICE_SHEET)) {
             waterVaporFactor = Math.max(0, (baseTemperature - 240) / 100 * hydrosphere * (Dice._2d6() - 1));
         } else {
             waterVaporFactor = 0;
@@ -251,11 +273,16 @@ public final class GenerateTerrestrialPlanet {
                                                                planet.getRadius(),
                                                                gravity,
                                                                planet);
-        atmoPressure = FindAtmoPressure.findAtmoPressure(tectonicActivityGroup, hydrosphere, planet.isBoilingAtmo(), mass, atmoshericComposition);
+        atmoPressure = FindAtmoPressure.findAtmoPressure(tectonicActivityGroup,
+                                                         hydrosphere,
+                                                         planet.isBoilingAtmo(),
+                                                         mass,
+                                                         atmoshericComposition);
 
         // TODO Special considerations for c objects, this should be expanded upon when these gets more details
 
-        if (orbitalObjectClass == 'c') { //These should never had a chance to get an "real" atmosphere in the first place but may have some traces
+        if (orbitalObjectClass == 'c') { //These should never had a chance to get an "real" atmosphere in the first
+            // place but may have some traces
             if (Dice.d6() < 6) atmoPressure = BigDecimal.valueOf(0);
             else atmoPressure = BigDecimal.valueOf(0.001);
         }
@@ -280,10 +307,13 @@ public final class GenerateTerrestrialPlanet {
         albedo = findAlbedo(InnerZone, atmoPressure.doubleValue(), hydrosphereDescription, planet);
         double greenhouseGasEffect = findGreenhouseGases(atmoshericComposition, atmoPressure.doubleValue());
 
-        greenhouseFactor = 1 + Math.sqrt(atmoPressure.doubleValue()) * 0.01 * (Dice.d6() + Dice.d6() - 1) + Math.sqrt(greenhouseGasEffect) * 0.1
-                                   + waterVaporFactor * 0.1;
+        greenhouseFactor = 1
+                           + sqrt(atmoPressure.doubleValue()) * 0.01 * (Dice._2d6() - 1)
+                           + sqrt(greenhouseGasEffect) * 0.1
+                           + waterVaporFactor * 0.1;
 
-        //TODO Here adding some Gaia moderation factor (needs tweaking probably) moving a bit more towards water/carbon ideal
+        //TODO Here adding some Gaia moderation factor (needs tweaking probably) moving a bit more towards
+        // water/carbon ideal
         if (lifeType.equals(Breathing.OXYGEN) && baseTemperature > 350) greenhouseFactor *= 0.8;
         if (lifeType.equals(Breathing.OXYGEN) && baseTemperature < 250) greenhouseFactor *= 1.2;
 
@@ -306,14 +336,24 @@ public final class GenerateTerrestrialPlanet {
         return planet;
     }
 
-    private static int getSurfaceTemp(int baseTemperature, BigDecimal atmoPressure, double albedo, double greenhouseFactor, boolean hasGaia) {
+    private static int getSurfaceTemp(int baseTemperature,
+                                      BigDecimal atmoPressure,
+                                      double albedo,
+                                      double greenhouseFactor,
+                                      boolean hasGaia) {
 
-        // My take on the effect of greenhouse and albedo on temperature max planerary temp is 1000 and the half point is 400
+        // My take on the effect of greenhouse and albedo on temperature max planerary temp is 1000 and the half
+        // point is 400
         double surfaceTemp;
-        if (hasGaia) surfaceTemp = 400 * (baseTemperature * albedo * greenhouseFactor) / (350 + baseTemperature * albedo * greenhouseFactor);
+        if (hasGaia)
+            surfaceTemp = 400 * (baseTemperature * albedo * greenhouseFactor) / (350 + baseTemperature * albedo *
+                                                                                       greenhouseFactor);
         else if (atmoPressure.doubleValue() > 0)
-            surfaceTemp = 800 * (baseTemperature * albedo * greenhouseFactor) / (400 + baseTemperature * albedo * greenhouseFactor);
-        else surfaceTemp = 1200 * (baseTemperature * albedo * greenhouseFactor) / (800 + baseTemperature * albedo * greenhouseFactor);
+            surfaceTemp = 800 * (baseTemperature * albedo * greenhouseFactor) / (400 + baseTemperature * albedo *
+                                                                                       greenhouseFactor);
+        else
+            surfaceTemp = 1200 * (baseTemperature * albedo * greenhouseFactor) / (800 + baseTemperature * albedo *
+                                                                                        greenhouseFactor);
         return (int) surfaceTemp;
     }
 
@@ -321,22 +361,24 @@ public final class GenerateTerrestrialPlanet {
     private static double calcLunarTidal(Planet planetEffectOn, Planet planetEffectOf) {
 
         return planetEffectOf.getMass().doubleValue()
-                       * 26640000
-                       / 333000.0
-                       / Math.pow(planetEffectOn.getRadius()
-                                          * planetEffectOf.getLunarOrbitDistance().doubleValue()
-                                          * 400
-                                          / 149600000
+               * 26640000
+               / 333000.0
+               / Math.pow(planetEffectOn.getRadius()
+                          * planetEffectOf.getLunarOrbitDistance().doubleValue()
+                          * 400
+                          / 149600000
                 , 3);
     }
 
     private static void adjustForOxygen(double atmoPressure, TreeSet<AtmosphericGases> atmosphericComposition) {
 
         Map<String, AtmosphericGases> atmoMap = atmosphericComposition
-                                                        .stream()
-                                                        .collect(Collectors.toMap(AtmosphericGases::getName, x -> x));
+                .stream()
+                .collect(Collectors.toMap(AtmosphericGases::getName, x -> x));
 
-        int oxygenMax = Math.max(50, (int) (Dice._3d6() * 2 / atmoPressure)); //This could be a bit more involved and interesting
+        int oxygenMax = Math.max(50,
+                                 (int) (Dice._3d6() * 2 / atmoPressure)); //This could be a bit more involved and
+        // interesting
 
         if (atmoMap.containsKey("CO2")) {
             if (atmoMap.get("CO2").getPercentageInAtmo() > oxygenMax) {
@@ -352,7 +394,9 @@ public final class GenerateTerrestrialPlanet {
             } else {
                 AtmosphericGases co2 = atmoMap.get("CO2");
                 atmoMap.remove("CO2");
-                atmoMap.put("O2", AtmosphericGases.builder().withName("O2").withPercentageInAtmo(co2.getPercentageInAtmo()).build());
+                atmoMap.put("O2",
+                            AtmosphericGases.builder().withName("O2").withPercentageInAtmo(co2.getPercentageInAtmo())
+                                            .build());
             }
         } else { //if no CO2 we just find the largest and take from that
             AtmosphericGases gas = atmosphericComposition.pollFirst();
@@ -369,13 +413,42 @@ public final class GenerateTerrestrialPlanet {
                                                       .build());
                     atmoMap.put(gas.getName(), AtmosphericGases.builder()
                                                                .withName("O2")
-                                                               .withPercentageInAtmo(gas.getPercentageInAtmo() - oxygenMax)
+                                                               .withPercentageInAtmo(gas.getPercentageInAtmo() -
+                                                                                     oxygenMax)
                                                                .build());
                 }
             }
         }
+
+        removeCombustibles(atmoMap);
         atmosphericComposition.clear();
         atmosphericComposition.addAll(atmoMap.values());
+    }
+
+    private static void removeCombustibles(Map<String, AtmosphericGases> atmoMap) {
+        int removedpercentages = 0;
+        if (atmoMap.containsKey("CH4")) {
+            removedpercentages += atmoMap.get("CH4").getPercentageInAtmo();
+            atmoMap.remove("CH4");
+        }
+        if (atmoMap.containsKey("H2")) {
+            removedpercentages += atmoMap.get("H2").getPercentageInAtmo();
+            atmoMap.remove("H2");
+        }
+        if (atmoMap.containsKey("NH3")) {
+            removedpercentages += atmoMap.get("NH3").getPercentageInAtmo();
+            atmoMap.remove("NH3");
+        }
+        if (removedpercentages > 0) {
+            if (atmoMap.containsKey("N2")) {
+                removedpercentages += atmoMap.get("N2").getPercentageInAtmo();
+                atmoMap.remove("N2");
+            }
+            atmoMap.put("N2", AtmosphericGases.builder()
+                                              .withName("N2")
+                                              .withPercentageInAtmo(removedpercentages)
+                                              .build());
+        }
     }
 
     private static Breathing findLifeType(Set<AtmosphericGases> atmoshericComposition) {
@@ -383,8 +456,8 @@ public final class GenerateTerrestrialPlanet {
         return atmoshericComposition.stream()
                                     .map(AtmosphericGases::getName)
                                     .anyMatch(b -> b.equals("NH3"))
-                       ? Breathing.AMMONIA
-                       : Breathing.OXYGEN;
+               ? Breathing.AMMONIA
+               : Breathing.OXYGEN;
 
 
     }
@@ -400,10 +473,10 @@ public final class GenerateTerrestrialPlanet {
                                                      double orbitalPeriod) {
 
         double[][] temperatureRangeBand = new double[][]{ // First is Low Moderation atmos, then Average etc
-                {1.10, 1.07, 1.05, 1.03, 1.00, 0.97, 0.93, 0.87, 0.78, 0.68},
-                {1.05, 1.04, 1.03, 1.02, 1.00, 0.98, 0.95, 0.90, 0.82, 0.75},
-                {1.02, 1.02, 1.02, 1.01, 1.00, 0.99, 0.98, 0.95, 0.91, 0.87},
-                {1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00}
+                                                          {1.10, 1.07, 1.05, 1.03, 1.00, 0.97, 0.93, 0.87, 0.78, 0.68},
+                                                          {1.05, 1.04, 1.03, 1.02, 1.00, 0.98, 0.95, 0.90, 0.82, 0.75},
+                                                          {1.02, 1.02, 1.02, 1.01, 1.00, 0.99, 0.98, 0.95, 0.91, 0.87},
+                                                          {1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00}
         };
 
         double[] summerTemperature = new double[10];
@@ -419,30 +492,31 @@ public final class GenerateTerrestrialPlanet {
         testModeration += (int) (Math.sqrt(rotationalPeriod / 24));
         testModeration += (int) (10 / axialTilt);
 
-        String atmoModeration = "Average";
-        if (testModeration < -2) atmoModeration = "Low";
-        if (testModeration > 2) atmoModeration = "High";
+        String atmoModeration;
         if (atmoPressure == 0) atmoModeration = "No";
-        if (atmoPressure > 10) atmoModeration = "Extreme";
+        else if (atmoPressure > 10) atmoModeration = "Extreme";
+        else if (testModeration < -2) atmoModeration = "Low";
+        else if (testModeration > 2) atmoModeration = "High";
+        else atmoModeration = "Average";
 
-        int index;
+        int atmoIndex;
         switch (atmoModeration) {
             case "High":
-                index = 2;
+                atmoIndex = 2;
                 break;
             case "Average":
-                index = 1;
+                atmoIndex = 1;
                 break;
             case "Extreme":
-                index = 3;
+                atmoIndex = 3;
                 break;
             default:
-                index = 0;
+                atmoIndex = 0;
                 break;
         }
 
         for (int i = 0; i < 10; i++) {
-            latitudeTemperature[i] = temperatureRangeBand[index][i] * surfaceTemp;
+            latitudeTemperature[i] = temperatureRangeBand[atmoIndex][i] * surfaceTemp;
         }
 
         for (int i = 0; i < 10; i++) {
@@ -455,7 +529,7 @@ public final class GenerateTerrestrialPlanet {
             // This part is supposed to shift the rangebands for summer /winter effects, it makes an
             // (to me unproven) assumption that winter temperatures at the poles is not changed by seasonal effects
             // this feels odd but I have to delve further into the science before I dismiss it.
-            // the effect occurs from interscetion of axial tilt effects and rangeband effects in a way that
+            // the effect occurs from the intersection of axial tilt effects and rangeband effects in a way that
             //makes me suspect it is unintentional.
             int axialTiltEffect = (int) (axialTilt / 10);
             int summer = Math.max(0, i - axialTiltEffect);
@@ -480,7 +554,10 @@ public final class GenerateTerrestrialPlanet {
      * This should be reworked (in conjuction with atmo) to remove CL and F from naturally occuring and instead
      * treat them similar to Oxygen. Also the Ammonia is dependent on free water as written right now
      */
-    private static boolean testLife(int baseTemperature, double atmoPressure, int hydrosphere, Set<AtmosphericGases> atmoshericComposition) {
+    private static boolean testLife(int baseTemperature,
+                                    double atmoPressure,
+                                    int hydrosphere,
+                                    Set<AtmosphericGases> atmoshericComposition) {
 
         double lifeIndex = 0;
 
@@ -529,7 +606,10 @@ public final class GenerateTerrestrialPlanet {
     }
 
 
-    private static double findAlbedo(boolean InnerZone, double atmoPressure, HydrosphereDescription hydrosphereDescription, Planet planet) {
+    private static double findAlbedo(boolean InnerZone,
+                                     double atmoPressure,
+                                     HydrosphereDescription hydrosphereDescription,
+                                     Planet planet) {
 
         int mod = 0;
         int[] randAlbedoArray;
@@ -544,8 +624,12 @@ public final class GenerateTerrestrialPlanet {
             } else if (atmoPressure > 5) {
                 mod = -2;
             }
-            if (planet.getHydrosphere() > 50 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) && mod > -2) mod = -2;
-            if (planet.getHydrosphere() > 90 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) && mod > -4) mod = -4;
+            if (planet.getHydrosphere() > 50 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) &&
+                mod > -2)
+                mod = -2;
+            if (planet.getHydrosphere() > 90 && hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET) &&
+                mod > -4)
+                mod = -4;
 
         } else {
             randAlbedoArray = new int[]{0, 4, 6, 8, 10};
@@ -556,13 +640,13 @@ public final class GenerateTerrestrialPlanet {
 
     private static int findTheHydrosphere(HydrosphereDescription hydrosphereDescription, int radius) {
 
-//        Supplier<Integer> zeroHydro = () -> 0;
-//        Supplier<Integer> superficialHydro = () -> Dice.d10()/2;
-//        Supplier<Integer> vLowHydro = Dice::d10;
-//        Supplier<Integer> lowHydro = () -> Dice.d10() + 10;
-//        Supplier<Integer> mediumHydro = () -> Dice.d20() + 20;
-//        Supplier<Integer> highHydro = () -> Dice.d20()+ Dice.d20()+ Dice.d20() +37;
-//        Supplier<Integer> vHighHydro = () -> 100;
+        //        Supplier<Integer> zeroHydro = () -> 0;
+        //        Supplier<Integer> superficialHydro = () -> Dice.d10()/2;
+        //        Supplier<Integer> vLowHydro = Dice::d10;
+        //        Supplier<Integer> lowHydro = () -> Dice.d10() + 10;
+        //        Supplier<Integer> mediumHydro = () -> Dice.d20() + 20;
+        //        Supplier<Integer> highHydro = () -> Dice.d20()+ Dice.d20()+ Dice.d20() +37;
+        //        Supplier<Integer> vHighHydro = () -> 100;
 
         List<Supplier<Integer>> hydroList = Arrays.asList(() -> Dice.d10() / 2,
                                                           Dice::d10,
@@ -577,7 +661,7 @@ public final class GenerateTerrestrialPlanet {
         Integer tempHydro = 0;
 
         if (hydrosphereDescription.equals(HydrosphereDescription.LIQUID)
-                    || hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET)) {
+            || hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET)) {
             if (radius < 2000) {
                 tempHydro = TableMaker.makeRoll(Dice._2d6(), wetSmallPlanetHydro, hydroList).get();
             } else if (radius < 4000) {

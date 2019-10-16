@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import com.github.hteph.Utilities.enums.Breathing;
-import com.github.hteph.Utilities.numberUtilities;
+import com.github.hteph.Utilities.NumberUtilities;
 
 public class Jovian extends OrbitalObjects {
 	
@@ -62,7 +62,7 @@ public class Jovian extends OrbitalObjects {
 	}
 
 	public void setOrbitalPeriod(double orbitalPeriod) {
-		this.orbitalPeriod = numberUtilities.nicefyDouble(orbitalPeriod);
+		this.orbitalPeriod = NumberUtilities.nicefyDouble(orbitalPeriod);
 	}
 
 	public double getAxialTilt() {
@@ -94,7 +94,7 @@ public class Jovian extends OrbitalObjects {
 	}
 
 	public void setMagneticField(double magneticField) {
-		this.magneticField = numberUtilities.nicefyDouble( magneticField);
+		this.magneticField = NumberUtilities.nicefyDouble(magneticField);
 	}
 
 	public int getBaseTemperature() {

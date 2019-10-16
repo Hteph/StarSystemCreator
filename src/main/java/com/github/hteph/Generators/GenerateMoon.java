@@ -19,15 +19,17 @@ public class GenerateMoon {
 
         lunarOrbitDistance[0] = 3 + 150 / number * (Dice._2d6() - 2) / 10; //in planet Radii
 
-        for (int i = 1; i < number; i++) lunarOrbitDistance[i] = lunarOrbitDistance[i - 1] + 1 + 150 / number * (Dice._2d6() - 2) / 10;
+        for (int i = 1; i < number; i++) lunarOrbitDistance[i] = lunarOrbitDistance[i - 1] + 1 + 150 / number * (Dice._2d6() - 2) / 10.0;
+
 
         for (int i = 0; i < number; i++) {
+
             Planet moon = (Planet) GenerateTerrestrialPlanet.Generator(planet.getArchiveID() + "." + i,
                                                                        planet.getName() + letters[i],
                                                                        "A moon",
                                                                        "lunar object",
                                                                        planet.getOrbitalDistance(),
-                                                                       'm',
+                                                                       Dice.d6(2)?'m':'M',
                                                                        planet,
                                                                        lunarOrbitDistance[i]);
 

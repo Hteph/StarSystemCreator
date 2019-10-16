@@ -5,7 +5,6 @@ import com.github.hteph.ObjectsOfAllSorts.OrbitalObjects;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.Tables.TableMaker;
 import com.github.hteph.Utilities.Dice;
-import com.github.hteph.Utilities.numberUtilities;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
