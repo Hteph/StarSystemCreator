@@ -29,7 +29,7 @@ public final class Pagemaker {
     //Methods------------------------------------------------
     public static VBox generator(StellarObject target) {
         VBox page = new VBox();
-        if (target instanceof Star) page = PageGenerator((Star) target);
+        if(target instanceof Star) page = pageGenerator((Star) target);
         if (target instanceof Planet) page = pageGenerator((Planet) target);
         if (target instanceof Jovian) page = pageGenerator((Jovian) target);
         if (target instanceof AsteroidBelt) page = PageGenerator((AsteroidBelt) target);
@@ -40,39 +40,16 @@ public final class Pagemaker {
     private static VBox PageGenerator(AsteroidBelt asteroidBelt) {
         VBox infoPage = new VBox();
 
-        Text titelInfo = new Text("Asteroid Belt");
-
-        titelInfo.setFont(Font.font("Verdana", 20));
-        HBox topBox = new HBox();
-        topBox.setAlignment(Pos.CENTER);
-        topBox.getChildren().add(titelInfo);
-        topBox.setPadding(new Insets(15, 12, 15, 12));
-
-        infoPage.getChildren().add(topBox);
+        infoPage.getChildren().add(getTitleBox("Asteroid Belt"));
 
         TextArea description = new TextArea(asteroidBelt.getDescription());
         description.setPrefColumnCount(60);
         description.setWrapText(true);
 
-        Rectangle planetSphere = new Rectangle();
-        planetSphere.setTranslateX(200);
-        planetSphere.setTranslateY(150);
-
-
-        Color ambiColor = new Color(1.0, 1.0, 1.0, 0.5);
-
-        AmbientLight light = new AmbientLight();
-        light.setColor(ambiColor);
-
-        PointLight light2 = new PointLight();
-        light2.setColor(Color.WHITE);
+        Group displayPlanet = getAsteroidPicture();
 
         BackgroundImage myBI = getBackgroundImage("/Starfield.png");
-
-        Group displayPlanet = new Group(planetSphere, light, light2);
-
-
-        HBox pictBox = new HBox(displayPlanet);
+        HBox pictBox = new HBox(getAsteroidPicture());
 
         pictBox.setBackground(new Background(myBI));
 
@@ -83,25 +60,11 @@ public final class Pagemaker {
         infoPage.getChildren().add(introPlanet);
 
         //making the first fact pane
-        TitledPane firstTitledPane = new TitledPane();
-        firstTitledPane.setText("Basic Facts");
 
-        ListView<String> factList = new ListView<>();
+        ObservableList<String> asteroidFacts = FXCollections.observableArrayList("Asteroidbelt Type: " + asteroidBelt.getAsterioidBeltType(),
+                                                                               "Asteroidbelt width [AU]:" + asteroidBelt.getAsteroidBeltWidth());
 
-        ObservableList<String> jovianFacts = FXCollections.observableArrayList("Asteroidbelt Type: " + asteroidBelt.getAsterioidBeltType(),
-                                                                               "Asteroidbelt width [AU]:"
-                                                                                       + String.valueOf(asteroidBelt.getAsteroidBeltWidth()));
-
-        factList.setItems(jovianFacts);
-        factList.maxWidth(50);
-        factList.setPrefHeight(100);
-
-        VBox factBox = new VBox();
-
-        factBox.getChildren().add(factList);
-        factBox.setPadding(new Insets(15, 12, 15, 12));
-
-        firstTitledPane.setContent(factBox);
+        TitledPane firstTitledPane = getTitledPane("Basic Facts",asteroidFacts);
 
         Accordion furtherFacts = new Accordion();
         furtherFacts.getPanes().addAll(firstTitledPane);
@@ -165,37 +128,20 @@ public final class Pagemaker {
         return infoPage;
     }
 
-    private static BackgroundImage getBackgroundImage(String backgroundPicture) {
-        return new BackgroundImage(new Image(backgroundPicture,
-                                             833,
-                                             833,
-                                             false,
-                                             true),
-                                   BackgroundRepeat.REPEAT,
-                                   BackgroundRepeat.NO_REPEAT,
-                                   BackgroundPosition.DEFAULT,
-                                   BackgroundSize.DEFAULT);
-    }
-
     private static VBox pageGenerator(Planet planet) {
 
         VBox infoPage = new VBox();
 
-        Text titelInfo = new Text(planet.getName() + " (" + planet.getClassificationName() + ")");
-
-        titelInfo.setFont(Font.font("Verdana", 20));
-        HBox topBox = new HBox();
-        topBox.setAlignment(Pos.CENTER);
-        topBox.getChildren().add(titelInfo);
-        topBox.setPadding(new Insets(15, 12, 15, 12));
-
-        infoPage.getChildren().add(topBox);
+        infoPage.getChildren().add(getTitleBox(planet.getName() + " (" + planet.getClassificationName() + ")"));
 
         TextArea description = new TextArea(planet.getDescription());
         description.setPrefColumnCount(60);
         description.setWrapText(true);
 
-        HBox pictBox = new HBox(getSphere(planet, new Image("/normalmap.png")));
+        final PhongMaterial planetColour = new PhongMaterial();
+        findObjectColour(planet, planetColour);
+
+        HBox pictBox = new HBox(getSphere(planetColour, new Image("/normalmap.png")));
         pictBox.setBackground(new Background(getBackgroundImage("/Starfield.png")));
 
         HBox introPlanet = new HBox(description, pictBox);
@@ -220,7 +166,7 @@ public final class Pagemaker {
                                                                              "Hydrosphere [%]: " + planet.getHydrosphere());
 
         TitledPane secondTitledPane = getTitledPane("Atmospheric Facts", atmoFacts);
-//making the third fact pane
+        //making the third fact pane
         ObservableList<String> geoFacts = FXCollections.observableArrayList("Radius [km]: " + planet.getRadius(),
                                                                             "Density [Earth-norm]: " + planet.getDensity(),
                                                                             "Core type: " + planet.getTectonicCore(),
@@ -241,7 +187,6 @@ public final class Pagemaker {
         TitledPane fourthTitledPane = getTitledPane("Habitational Facts", climateFacts);
 
         //Rangeband display
-
         TitledPane fifthTitledPane = new TitledPane("Temperature Rangebands", getTemperatureRangeBandHelpClassTableView(planet));
 
         //Making the page
@@ -252,24 +197,109 @@ public final class Pagemaker {
         return infoPage;
     }
 
-    private static Group getSphere(Planet planet, Image normalMap) {
-        Sphere planetSphere = new Sphere(100);
-        planetSphere.setTranslateX(200);
-        planetSphere.setTranslateY(150);
 
-        final PhongMaterial planetColour = new PhongMaterial();
-        findObjectColour(planet, planetColour);
-        planetSphere.setMaterial(planetColour);
+    private static VBox pageGenerator(Star star) {
 
-        planetColour.setBumpMap(normalMap);
+        VBox infoPage = new VBox();
+
+        infoPage.getChildren().add(getTitleBox(star.getName() + " (" + star.getClassification() + ")"));
+
+        TextArea description = new TextArea(star.getDescription());
+        description.setPrefColumnCount(60);
+        description.setWrapText(true);
+
+        final PhongMaterial starColour = new PhongMaterial();
+
+        findObjectColour(star, starColour);
+
+        //making the factbox
+        HBox test = new HBox(getSphere(starColour, new Image("/normalmap.png")));
+        test.setBackground(new Background(getBackgroundImage("/resources/Starfield.png")));
+
+        HBox intro = new HBox(description, test);
+        intro.setPadding(new Insets(15, 12, 15, 12));
+        intro.setSpacing(10);
+
+        infoPage.getChildren().add(intro);
+
+        ObservableList<String> starFacts = FXCollections.observableArrayList("Lumosity [Sol-eqv]: " + star.getLumosity(),
+                                                                             "Mass [Sol-eqv]: " + star.getMass(),
+                                                                             "Diameter [Sol-eqv]: " + star.getAge());
+
+        TitledPane firstTitledPane = getTitledPane("Star Facts",starFacts);
+
+        //Making the other listnings (here the other main objects in the system)
+
+        TableView<StellarObject> table = new TableView<StellarObject>();
+        ObservableList<StellarObject> systemOrbitsObjects = FXCollections.observableArrayList();
+
+        for (int i = 1; i < star.getOrbitalObjects().size(); i++) {
+            systemOrbitsObjects.add(CentralRegistry.getFromArchive(star.getOrbitalObjects().get(i)));
+        }
+        table.itemsProperty().set(systemOrbitsObjects);
+
+        TableColumn<StellarObject, Double> orbit = new TableColumn<>("Orbit Distance [Au]");
+        TableColumn<StellarObject, String> name = new TableColumn<>("Object Name");
+        TableColumn<StellarObject, String> type = new TableColumn<>("Object Type");
+        TableColumn<StellarObject, String> life = new TableColumn<>("Native Life");
+
+        orbit.setCellValueFactory(new PropertyValueFactory<>("orbitDistanceStar"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        type.setCellValueFactory(new PropertyValueFactory<>("classificationName"));
+        life.setCellValueFactory(new PropertyValueFactory<>("lifeType"));
+
+        table.getColumns().addAll(orbit, name, type, life);
+        TitledPane secondTitledPane = new TitledPane("System Objects",table);
+
+        Accordion furtherFacts = new Accordion();
+        furtherFacts.getPanes().addAll(firstTitledPane, secondTitledPane);
+        infoPage.getChildren().add(furtherFacts);
+        return infoPage;
+    }
+
+    private static Group getSphere(PhongMaterial material, Image normalMap) {
+        Sphere sphere = new Sphere(100);
+        sphere.setTranslateX(200);
+        sphere.setTranslateY(150);
+        sphere.setMaterial(material);
+
+        material.setBumpMap(normalMap);
         AmbientLight light = new AmbientLight(new Color(1.0, 1.0, 1.0, 0.5));
 
         PointLight light2 = new PointLight(Color.WHITE);
+        return new Group(sphere, light, light2);
+    }
+
+    private static BackgroundImage getBackgroundImage(String backgroundPicture) {
+        return new BackgroundImage(new Image(backgroundPicture,
+                                             833,
+                                             833,
+                                             false,
+                                             true),
+                                   BackgroundRepeat.REPEAT,
+                                   BackgroundRepeat.NO_REPEAT,
+                                   BackgroundPosition.DEFAULT,
+                                   BackgroundSize.DEFAULT);
+    }
+
+    private static Group getAsteroidPicture() {
+        Rectangle planetSphere = new Rectangle();
+        planetSphere.setTranslateX(200);
+        planetSphere.setTranslateY(150);
+
+        Color ambiColor = new Color(1.0, 1.0, 1.0, 0.5);
+
+        AmbientLight light = new AmbientLight();
+        light.setColor(ambiColor);
+
+        PointLight light2 = new PointLight();
+        light2.setColor(Color.WHITE);
+
         return new Group(planetSphere, light, light2);
     }
 
     private static TableView<TemperatureRangeBandHelpClass> getTemperatureRangeBandHelpClassTableView(Planet planet) {
-        TableView<TemperatureRangeBandHelpClass> temperatureTable = new TableView<TemperatureRangeBandHelpClass>();
+        TableView<TemperatureRangeBandHelpClass> temperatureTable = new TableView<>();
         ObservableList<TemperatureRangeBandHelpClass> temperatures = FXCollections.observableArrayList();
 
         TemperatureRangeBandHelpClass base = new TemperatureRangeBandHelpClass("Base temp [C]", planet.getRangeBandTemperature());
@@ -294,147 +324,20 @@ public final class Pagemaker {
         TableColumn<TemperatureRangeBandHelpClass, Double> nine = new TableColumn<>("75-85");
         TableColumn<TemperatureRangeBandHelpClass, Double> ten = new TableColumn<>("Polar");
 
-        name.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, String>("name"));
-        one.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Integer>("one"));
-        two.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("two"));
-        three.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("three"));
-        four.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("four"));
-        five.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("five"));
-        six.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("six"));
-        seven.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("seven"));
-        eight.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("eight"));
-        nine.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("nine"));
-        ten.setCellValueFactory(new PropertyValueFactory<TemperatureRangeBandHelpClass, Double>("ten"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        one.setCellValueFactory(new PropertyValueFactory<>("one"));
+        two.setCellValueFactory(new PropertyValueFactory<>("two"));
+        three.setCellValueFactory(new PropertyValueFactory<>("three"));
+        four.setCellValueFactory(new PropertyValueFactory<>("four"));
+        five.setCellValueFactory(new PropertyValueFactory<>("five"));
+        six.setCellValueFactory(new PropertyValueFactory<>("six"));
+        seven.setCellValueFactory(new PropertyValueFactory<>("seven"));
+        eight.setCellValueFactory(new PropertyValueFactory<>("eight"));
+        nine.setCellValueFactory(new PropertyValueFactory<>("nine"));
+        ten.setCellValueFactory(new PropertyValueFactory<>("ten"));
 
         temperatureTable.getColumns().addAll(name, one, two, three, four, five, six, seven, eight, nine, ten);
         return temperatureTable;
-    }
-
-    private static TitledPane getTitledPane(String title, ObservableList<String> facts) {
-
-        ListView<String> factList = getFactList(facts);
-        VBox geoFactBox = new VBox();
-        geoFactBox.getChildren().add(factList);
-        geoFactBox.setPadding(new Insets(15, 12, 15, 12));
-        return new TitledPane(title, geoFactBox);
-    }
-
-    private static ListView<String> getFactList(ObservableList<String> facts) {
-        ListView<String> factList = new ListView<>();
-        factList.setItems(facts);
-        factList.maxWidth(50);
-        factList.setPrefHeight(150);
-        return factList;
-    }
-
-
-    private static VBox PageGenerator(Star star) {
-
-        VBox infoPage = new VBox();
-
-        Text titelInfo = new Text(star.getName() + " (" + star.getClassification() + ")");
-
-        titelInfo.setFont(Font.font("Verdana", 20));
-
-        HBox topBox = new HBox();
-        topBox.setAlignment(Pos.CENTER);
-        topBox.getChildren().add(titelInfo);
-        topBox.setPadding(new Insets(15, 12, 15, 12));
-
-        infoPage.getChildren().add(topBox);
-
-
-        TextArea description = new TextArea(star.getDescription());
-        description.setPrefColumnCount(60);
-        description.setWrapText(true);
-        //Making the picture of star
-        Sphere starSphere = new Sphere(100);
-        starSphere.setTranslateX(200);
-        starSphere.setTranslateY(150);
-
-        final PhongMaterial starColour = new PhongMaterial();
-
-        findObjectColour(star, starColour);
-
-        starSphere.setMaterial(starColour);
-
-        Image normalMap = new Image("/normalmap.png");
-
-        starColour.setBumpMap(normalMap);
-
-        Color ambiColor = new Color(1.0, 1.0, 1.0, 0.1);
-
-        AmbientLight light = new AmbientLight();
-        light.setColor(ambiColor);
-
-        PointLight light2 = new PointLight();
-        light2.setColor(Color.WHITE);
-
-        BackgroundImage myBI = getBackgroundImage("/resources/Starfield.png");
-
-        Group displayStar = new Group(starSphere, light, light2);
-        //making the factbox
-        HBox test = new HBox(displayStar);
-        test.setBackground(new Background(myBI));
-
-        HBox intro = new HBox(description, test);
-        intro.setPadding(new Insets(15, 12, 15, 12));
-        intro.setSpacing(10);
-
-        infoPage.getChildren().add(intro);
-
-        TitledPane firstTitledPane = new TitledPane();
-        firstTitledPane.setText("Facts");
-
-        ListView<String> factList = new ListView<>();
-
-        ObservableList<String> starFacts = FXCollections.observableArrayList("Lumosity [Sol-eqv]: " + star.getLumosity(),
-                                                                             "Mass [Sol-eqv]: " + star.getMass(),
-                                                                             "Diameter [Sol-eqv]: " + star.getAge());
-
-        factList.setItems(starFacts);
-        factList.maxWidth(50);
-        factList.setPrefHeight(100);
-
-        VBox factBox = new VBox();
-
-        factBox.getChildren().add(factList);
-        factBox.setPadding(new Insets(15, 12, 15, 12));
-
-        firstTitledPane.setContent(factBox);
-
-        //Making the other listnings (here the other main objects in the system)
-        TitledPane secondTitledPane = new TitledPane();
-        secondTitledPane.setText("System Objects");
-
-        TableView<StellarObject> table = new TableView<StellarObject>();
-        ObservableList<StellarObject> systemOrbitsObjects = FXCollections.observableArrayList();
-
-        for (int i = 1; i < star.getOrbitalObjects().size(); i++) {
-            systemOrbitsObjects.add(CentralRegistry.getFromArchive(star.getOrbitalObjects().get(i)));
-        }
-        table.itemsProperty().set(systemOrbitsObjects);
-
-        TableColumn<StellarObject, Double> orbit = new TableColumn<>("Orbit Distance [Au]");
-        TableColumn<StellarObject, String> name = new TableColumn<>("Object Name");
-        TableColumn<StellarObject, String> type = new TableColumn<>("Object Type");
-        TableColumn<StellarObject, String> life = new TableColumn<>("Native Life");
-
-        orbit.setCellValueFactory(new PropertyValueFactory<StellarObject, Double>("orbitDistanceStar"));
-        name.setCellValueFactory(new PropertyValueFactory<StellarObject, String>("name"));
-        type.setCellValueFactory(new PropertyValueFactory<StellarObject, String>("classificationName"));
-        life.setCellValueFactory(new PropertyValueFactory<StellarObject, String>("lifeType"));
-
-        table.getColumns().addAll(orbit, name, type, life);
-
-        secondTitledPane.setContent(table);
-
-        Accordion furtherFacts = new Accordion();
-        furtherFacts.getPanes().addAll(firstTitledPane, secondTitledPane);
-
-        infoPage.getChildren().add(furtherFacts);
-
-        return infoPage;
     }
 
     private static void findObjectColour(Planet planet, PhongMaterial planetColour) {
@@ -485,5 +388,33 @@ public final class Pagemaker {
                 starColour.setDiffuseColor(Color.DARKORCHID);
                 break;
         }
+    }
+
+    private static TitledPane getTitledPane(String title, ObservableList<String> facts) {
+
+        ListView<String> factList = makeFactList(facts);
+        VBox geoFactBox = new VBox();
+        geoFactBox.getChildren().add(factList);
+        geoFactBox.setPadding(new Insets(15, 12, 15, 12));
+        return new TitledPane(title, geoFactBox);
+    }
+
+    private static ListView<String> makeFactList(ObservableList<String> facts) {
+        ListView<String> factList = new ListView<>();
+        factList.setItems(facts);
+        factList.maxWidth(50);
+        factList.setPrefHeight(150);
+        return factList;
+    }
+
+    private static HBox getTitleBox(String a) {
+        Text titelInfo = new Text(a);
+
+        titelInfo.setFont(Font.font("Verdana", 20));
+        HBox topBox = new HBox();
+        topBox.setAlignment(Pos.CENTER);
+        topBox.getChildren().add(titelInfo);
+        topBox.setPadding(new Insets(15, 12, 15, 12));
+        return topBox;
     }
 }

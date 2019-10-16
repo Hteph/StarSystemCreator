@@ -1,7 +1,7 @@
 package com.github.hteph.GUI;
 
 import com.github.hteph.Generators.StarFactory;
-import com.github.hteph.Generators.StarSystemGenerator;
+import com.github.hteph.Generators.*;
 import com.github.hteph.ObjectsOfAllSorts.CentralRegistry;
 import com.github.hteph.ObjectsOfAllSorts.Planet;
 import com.github.hteph.ObjectsOfAllSorts.Star;
