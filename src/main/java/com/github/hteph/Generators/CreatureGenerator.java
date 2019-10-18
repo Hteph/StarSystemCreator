@@ -49,14 +49,14 @@ public class CreatureGenerator {
         if(lifeform.getHabitat().equals(EnvironmentalEnum.EXOTIC)) bonus2 -=6;
 
 
-        if(Dice._3d6lessThan(16+bonus+bonus2)) {
+        if(Dice._3d6(16+bonus+bonus2)) {
             lifeform.getBody().setBodySymmetry(Symmetry.BILATERAL);
             lifeform.getBody().setLimbSegments(TableMaker.makeRoll(
                     Dice.d6(),
                     new int[]{1,2,6},
                     new Integer[]{1,2,Dice.d6()+2}));
 
-        } else if(Dice._3d6lessThan(16+bonus2)){
+        } else if(Dice._3d6(16+bonus2)){
             int sides = Dice.d6()+2;
             switch(sides){
                 case 3: lifeform.getBody().setBodySymmetry(Symmetry.TRILATERAL);
@@ -84,18 +84,19 @@ public class CreatureGenerator {
     private static void gravityEffects(Sophont lifeform){
 
     double gravity =((Planet)(CentralRegistry.getFromArchive(lifeform.getHomeworld()))).getGravity().doubleValue();
+    int bonus=0;
     int roll=Dice._3d6();
 
     if(gravity<0.7) {
         roll +=3;
         lifeform.addAttribute(Attributes.STRENGTH, -1);
         lifeform.addAttribute(Attributes.CONSTITUTION, -1);
-        lifeform.addAttribute("G-Tolerance", -1,"XXX");
+        lifeform.addAttribute("G-Tolerance", -1,"The lifeform is sensitive to acceleration forces");
         lifeform.addAttribute(Attributes.FRAME,3);
 
     }else if (gravity>1.5) {
         roll +=-3;
-        lifeform.addAttribute("G-Tolerance", 1,"XXX");
+        lifeform.addAttribute("G-Tolerance", 1,"The Lifeform is very tolerant towards acceleration forces");
         lifeform.addAttribute(Attributes.STRENGTH);
         lifeform.addAttribute(Attributes.CONSTITUTION);
         lifeform.addAttribute(Attributes.FRAME,-3);
@@ -104,6 +105,13 @@ public class CreatureGenerator {
     if(roll<6) lifeform.addAttribute("Acceleration Weakness", "XXX");
     else if(roll>16) lifeform.addAttribute("Space Sickness","XXX");
     else if(roll>14) lifeform.addAttribute("Acceleration Tolerance","XXX");
+
+        String choice =TableMaker.makeRoll(
+                Dice._3d6()+bonus,
+                new int[]{0, 7, 16, 17},
+                new String[]{"Acceleration Weakness","None", "Space Sickness","Acceleration Tolerance"}
+        );
+
 }
 
     private static void decideMetabolism(Sophont lifeform) {

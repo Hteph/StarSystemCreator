@@ -37,19 +37,21 @@ public final class Dice {
         return (int) (1 + Math.random() * 10);
     }
 
-	public static boolean _3d6test(int lower, int upper){
+	public static boolean betweenOrEqual3d6(int lower, int upper){
+
+        //includinc the limits
 		int test = d6()+d6()+d6();
-		return test > lower & test < upper;
+		return test-1 > lower & test < upper+1;
 	}
 
-    public static boolean _3d6lessThan(int lessThan) {
+    public static boolean _3d6(int lessThan) {
 
         return d6() + d6() + d6() < lessThan;
     }
 
     public static boolean _3d6HigherOr(int higherOr) {
 
-        return d6() + d6() + d6() > higherOr - 1;
+        return higherOr < d6() + d6() + d6();
     }
 
     public static int d20() {

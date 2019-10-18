@@ -15,6 +15,7 @@ public enum Attributes implements baseEnum {
     EMPATHY("Empathy","The power of understanding and imaginatively entering into another person's feelings"),
     FRAME("Body Frame","How is the body of the lifeform distributed in comparison with a human."),
     GREGARIOUSNESS("Gregariousness","How fond of the company of others; sociable is the lifeform."),
+    HEALTH("Health", "How resistant the lifeforms body is to invasions of pathogens and poisons"),
     IMAGINATION("Imagination","The faculty of producing ideas, mental images of what is not present or has not been experienced."),
     INTELLIGENCE("Intelligence","The capacity for understanding; ability to perceive and comprehend meaning"),
     LIFESPAN("Lifespan","How do the life length of the lifeforms scale to the average."),

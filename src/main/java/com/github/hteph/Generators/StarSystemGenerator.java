@@ -9,6 +9,9 @@ import com.github.hteph.Utilities.RomanNumber;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import static com.github.hteph.Utilities.NumberUtilities.sqrt;
+import static com.github.hteph.Utilities.NumberUtilities.squared;
+
 public final class StarSystemGenerator {
 
     private StarSystemGenerator() {
@@ -17,26 +20,25 @@ public final class StarSystemGenerator {
     //Methods ---------------------------------------------------------
     public static ArrayList<StellarObject> Generator(Star star) {
 
-        double innerLimit = Math.max(0.2 * star.getMass().doubleValue(),
-                                     0.0088 * Math.pow(star.getLumosity().doubleValue(), 0.5));
+        double innerLimit = Math.max(0.2 * star.getMass().doubleValue(), 0.0088 * sqrt(star.getLumosity().doubleValue()));
         //double innerHabitable = 0.95 * Math.pow(star.getLumosity(), 0.5); Try to use without locking to goldilock
         // theory
         //double outerHabitable = 1.3 * Math.pow(star.getLumosity(), 0.5);
-        double snowLine = 5 * Math.pow(star.getLumosity().doubleValue(), 0.5);
+        double snowLine = 5 * sqrt(star.getLumosity().doubleValue());
         double outerLimit = 40 * star.getMass().doubleValue();
         ArrayList<StellarObject> starSystemList = new ArrayList<>();
 
         starSystemList.add(0, star);
 
         //TODO how many orbits? This code makes no sense! changed, but need revision
-        int numberOfOrbits = Dice._2d6() + (int) Math.sqrt(star.getMass().doubleValue()) - 2;
+        int numberOfOrbits = Dice._2d6() + (int) sqrt(star.getMass().doubleValue()) - 2;
 
         BigDecimal[] orbitalDistancesArray = new BigDecimal[numberOfOrbits];
 
         //set the orbit distances
         orbitalDistancesArray[0] = BigDecimal.valueOf(0.05
-                                                              * Math.pow(star.getMass().doubleValue(), 2)
-                                                              * (Dice.d6() + Dice.d6()));
+                                                              * squared(star.getMass().doubleValue())
+                                                              * (Dice._2d6()));
 
         for (int i = 1; i < numberOfOrbits; i++) {
 
@@ -51,11 +53,11 @@ public final class StarSystemGenerator {
 
         //Dominant Gas giant (with accompanying Asteroid belt)?
         int astroidBeltCounter = 0;
-        if (Dice.d6() < 6) {
+        if (Dice.d6(6) ) {
             for (int i = numberOfOrbits - 2; i > 0; i--) {
                 if (orbitalDistancesArray[i].doubleValue() < snowLine) {
                     orbitalObjectBasicList[i + 1] = 'J';
-                    if (Dice.d6() < 6) {
+                    if (Dice.d6(6)) {
                         orbitalObjectBasicList[i] = 'A';
                         astroidBeltCounter++;
                     }

@@ -33,19 +33,22 @@ public final class JovianGenerator {
 
 		Jovian gasGiant = new Jovian (archiveID, name, description, classificationName, orbitDistance, orbitingAround);
 
+		boolean innerZone = false;
+		double snowLine = 5 * Math.pow(orbitingAround.getLumosity().doubleValue(), 0.5);
+		if(orbitDistance.doubleValue()<snowLine) innerZone=true;
+
 // size may not be all, but here it is set
 
 		if(orbitalObjectClass=='J') {
-			mass = 250*Dice._3d6()+Dice.d10()*100;
-			radius = (int) (60000+(Dice.d10()-orbitingAround.getAge().doubleValue()/2.0)*2000);
-			gasGiant.setRadius(radius);
-			gasGiant.setMass(mass);
+
+			gasGiant.setRadius((int) (60000+(Dice.d10()-orbitingAround.getAge().doubleValue()/2.0)*2000));
+			gasGiant.setMass(250*Dice._3d6()+Dice.d10()*100);
 		}
 		else {
-			radius = (Dice._2d6())*7000;
-			if(InnerZone) density = 0.1*Dice.d10()*0.025;
-			else density = 0.08*Dice.d10()*0.025;
-			gasGiant.setMass((int) cubed(gasGiant.getRadius()/6380.0)*density);
+
+			gasGiant.setMass((int) cubed(gasGiant.getRadius()/6380d)
+									 *(innerZone ? 0.1*Dice.d10()*0.025 : 0.08*Dice.d10()*0.025));
+			gasGiant.setRadius((Dice._2d6())*7000);
 		}
         gasGiant.setOrbitalPeriod(sqrt(cubed(orbitDistance.doubleValue())/orbitingAround.getMass().doubleValue())); //in earth years
 
