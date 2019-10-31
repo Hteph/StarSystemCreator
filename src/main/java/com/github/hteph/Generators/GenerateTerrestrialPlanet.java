@@ -6,7 +6,6 @@ import com.github.hteph.Tables.FindAtmoPressure;
 import com.github.hteph.Tables.TableMaker;
 import com.github.hteph.Tables.TectonicActivityTable;
 import com.github.hteph.Utilities.Dice;
-import com.github.hteph.Utilities.NumberUtilities;
 import com.github.hteph.Utilities.enums.Breathing;
 import com.github.hteph.Utilities.enums.HydrosphereDescription;
 
@@ -75,6 +74,7 @@ public final class GenerateTerrestrialPlanet {
         double sumOfLunarTidal = 0;
 
         //Ugly hack to be able to reuse this method for generating moons
+        //TODO solve this using interfaces?
         if (String.valueOf(orbitalObjectClass).equalsIgnoreCase("m")) {
             if (centralObject instanceof Planet) {
                 moonsPlanet = (Planet) centralObject;
@@ -105,11 +105,11 @@ public final class GenerateTerrestrialPlanet {
             List<Integer> baseSizeList = Arrays.asList(100, 200, 300, 400, 500, 600, 700);
             TableMaker.makeRoll(Dice.d10(), baseSizeList);
             if (moonsPlanet instanceof Planet) baseSize = Math.min(baseSize, ((Planet) moonsPlanet).getRadius() / 8);
-        }else if(orbitalObjectClass == 'm'){
+        } else if (orbitalObjectClass == 'm') {
             List<Integer> baseSizeList = Arrays.asList(1, 5, 10, 20, 30, 40, 50);
             TableMaker.makeRoll(Dice.d10(), baseSizeList);
             if (moonsPlanet instanceof Planet) baseSize = Math.min(baseSize, ((Planet) moonsPlanet).getRadius() / 8);
-    }else if (orbitalObjectClass == 't' || orbitalObjectClass == 'c') baseSize = 90;
+        } else if (orbitalObjectClass == 't' || orbitalObjectClass == 'c') baseSize = 90;
 
         planet.setRadius(Dice._2d6() * baseSize);
 
@@ -174,7 +174,7 @@ public final class GenerateTerrestrialPlanet {
             planet.setPlanetLocked(true);
         } else {
             tidalForce = (orbitingAround.getMass().doubleValue() * 26640000 / cubed(orbitDistance.doubleValue() * 400.0))
-                         / (1.0 + sumOfLunarTidal);
+                                 / (1.0 + sumOfLunarTidal);
             tidelock = (0.83 + (Dice._2d6() - 2) * 0.03) * tidalForce * orbitingAround.getAge().doubleValue() / 6.6;
             if (tidelock > 1) {
                 tidelocked = true;
@@ -233,10 +233,10 @@ public final class GenerateTerrestrialPlanet {
         //Magnetic field
         if (tectonicCore.contains("metal")) {
             magneticField = 10
-                            / (sqrt((rotationalPeriod / 24.0)))
-                            * squared(density)
-                            * sqrt(mass)
-                            / orbitingAround.getAge().doubleValue();
+                                    / (sqrt((rotationalPeriod / 24.0)))
+                                    * squared(density)
+                                    * sqrt(mass)
+                                    / orbitingAround.getAge().doubleValue();
             if (tectonicCore.contains("small")) magneticField *= 0.5;
             if (tectonicCore.contains("medium")) magneticField *= 0.75;
             if (tectonicActivityGroup.equals("Dead")) magneticField = Dice.d6() / 15.0;
@@ -305,9 +305,9 @@ public final class GenerateTerrestrialPlanet {
         double greenhouseGasEffect = findGreenhouseGases(atmoshericComposition, atmoPressure.doubleValue());
 
         greenhouseFactor = 1
-                           + sqrt(atmoPressure.doubleValue()) * 0.01 * (Dice._2d6() - 1)
-                           + sqrt(greenhouseGasEffect) * 0.1
-                           + waterVaporFactor * 0.1;
+                                   + sqrt(atmoPressure.doubleValue()) * 0.01 * (Dice._2d6() - 1)
+                                   + sqrt(greenhouseGasEffect) * 0.1
+                                   + waterVaporFactor * 0.1;
 
         //TODO Here adding some Gaia moderation factor (needs tweaking probably) moving a bit more towards
         // water/carbon ideal
@@ -344,12 +344,10 @@ public final class GenerateTerrestrialPlanet {
         if (hasGaia) {
             surfaceTemp = 400 * (baseTemperature * albedo * greenhouseFactor)
                                   / (350d + baseTemperature * albedo * greenhouseFactor);
-        }
-        else if (atmoPressure.doubleValue() > 0) {
+        } else if (atmoPressure.doubleValue() > 0) {
             surfaceTemp = 800 * (baseTemperature * albedo * greenhouseFactor)
                                   / (400d + baseTemperature * albedo * greenhouseFactor);
-        }
-        else {
+        } else {
             surfaceTemp = 1200 * (baseTemperature * albedo * greenhouseFactor)
                                   / (800d + baseTemperature * albedo * greenhouseFactor);
         }
@@ -372,8 +370,8 @@ public final class GenerateTerrestrialPlanet {
     private static void adjustForOxygen(double atmoPressure, TreeSet<AtmosphericGases> atmosphericComposition) {
 
         Map<String, AtmosphericGases> atmoMap = atmosphericComposition
-                .stream()
-                .collect(Collectors.toMap(AtmosphericGases::getName, x -> x));
+                                                        .stream()
+                                                        .collect(Collectors.toMap(AtmosphericGases::getName, x -> x));
 
         int oxygenMax = Math.max(50, (int) (Dice._3d6() * 2 / atmoPressure)); //This could be a bit more involved and interesting
 
@@ -392,7 +390,7 @@ public final class GenerateTerrestrialPlanet {
                 AtmosphericGases co2 = atmoMap.get("CO2");
                 atmoMap.remove("CO2");
                 atmoMap.put("O2", AtmosphericGases.builder().withName("O2").withPercentageInAtmo(co2.getPercentageInAtmo())
-                                            .build());
+                                                  .build());
             }
         } else { //if no CO2 we just find the largest and take from that
             AtmosphericGases gas = atmosphericComposition.pollFirst();
@@ -410,7 +408,7 @@ public final class GenerateTerrestrialPlanet {
                     atmoMap.put(gas.getName(), AtmosphericGases.builder()
                                                                .withName("O2")
                                                                .withPercentageInAtmo(gas.getPercentageInAtmo() -
-                                                                                     oxygenMax)
+                                                                                             oxygenMax)
                                                                .build());
                 }
             }
@@ -453,8 +451,8 @@ public final class GenerateTerrestrialPlanet {
         return atmoshericComposition.stream()
                                     .map(AtmosphericGases::getName)
                                     .anyMatch(b -> b.equals("NH3"))
-               ? Breathing.AMMONIA
-               : Breathing.OXYGEN;
+                       ? Breathing.AMMONIA
+                       : Breathing.OXYGEN;
 
 
     }
@@ -470,10 +468,10 @@ public final class GenerateTerrestrialPlanet {
                                                      double orbitalPeriod) {
 
         double[][] temperatureRangeBand = new double[][]{ // First is Low Moderation atmos, then Average etc
-                                                          {1.10, 1.07, 1.05, 1.03, 1.00, 0.97, 0.93, 0.87, 0.78, 0.68},
-                                                          {1.05, 1.04, 1.03, 1.02, 1.00, 0.98, 0.95, 0.90, 0.82, 0.75},
-                                                          {1.02, 1.02, 1.02, 1.01, 1.00, 0.99, 0.98, 0.95, 0.91, 0.87},
-                                                          {1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00}
+                {1.10, 1.07, 1.05, 1.03, 1.00, 0.97, 0.93, 0.87, 0.78, 0.68},
+                {1.05, 1.04, 1.03, 1.02, 1.00, 0.98, 0.95, 0.90, 0.82, 0.75},
+                {1.02, 1.02, 1.02, 1.01, 1.00, 0.99, 0.98, 0.95, 0.91, 0.87},
+                {1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00}
         };
 
         double[] summerTemperature = new double[10];
@@ -648,7 +646,7 @@ public final class GenerateTerrestrialPlanet {
         //        Supplier<Integer> vHighHydro = () -> 100;
 
         List<Supplier<Integer>> hydroList = Arrays.asList(() -> Dice.d10() / 2,
-                                                          () -> Dice.d10()/2 + 5,
+                                                          () -> Dice.d10() / 2 + 5,
                                                           () -> Dice.d10() + 10,
                                                           () -> Dice.d20() + 20,
                                                           () -> Dice.d20() + Dice.d20() + Dice.d20() + 37,
@@ -660,7 +658,7 @@ public final class GenerateTerrestrialPlanet {
         Integer tempHydro = 0;
 
         if (hydrosphereDescription.equals(HydrosphereDescription.LIQUID)
-            || hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET)) {
+                    || hydrosphereDescription.equals(HydrosphereDescription.ICE_SHEET)) {
             if (radius < 2000) {
                 tempHydro = TableMaker.makeRoll(Dice._2d6(), wetSmallPlanetHydro, hydroList).get();
             } else if (radius < 4000) {

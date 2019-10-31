@@ -8,11 +8,11 @@ public class OrbitalObjects extends StellarObject {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	protected BigDecimal orbitDistanceStar;
-	protected StellarObject orbitingAround;
-	protected double orbitaleccentricity;
-	protected char orbitalObjectClass;
-	protected BigDecimal localOrbitDistance;
+	private BigDecimal orbitDistanceStar;
+	private StellarObject orbitingAround;
+	private double orbitaleccentricity;
+	private char orbitalObjectClass;
+	private BigDecimal localOrbitDistance;
 		
 	//Constructor ----------------------------------------------------
 	

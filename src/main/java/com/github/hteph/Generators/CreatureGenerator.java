@@ -6,6 +6,7 @@ import com.github.hteph.Tables.Creature.BaseEnvironmentTable;
 import com.github.hteph.Tables.Creature.EnvironmentalAttributesTable;
 import com.github.hteph.Tables.TableMaker;
 import com.github.hteph.Utilities.Dice;
+import com.github.hteph.Utilities.NumberUtilities;
 import com.github.hteph.Utilities.enums.*;
 
 public class CreatureGenerator {
@@ -84,34 +85,44 @@ public class CreatureGenerator {
     private static void gravityEffects(Sophont lifeform){
 
     double gravity =((Planet)(CentralRegistry.getFromArchive(lifeform.getHomeworld()))).getGravity().doubleValue();
-    int bonus=0;
     int roll=Dice._3d6();
 
     if(gravity<0.7) {
-        roll +=3;
-        lifeform.addAttribute(Attributes.STRENGTH, -1);
+        int gravityeffect = (int) (10*(gravity-1));
+        roll +=gravityeffect;
+        lifeform.addAttribute(Attributes.STRENGTH, gravityeffect/2);
         lifeform.addAttribute(Attributes.CONSTITUTION, -1);
         lifeform.addAttribute("G-Tolerance", -1,"The lifeform is sensitive to acceleration forces");
-        lifeform.addAttribute(Attributes.FRAME,3);
+        lifeform.addAttribute(Attributes.FRAME,gravityeffect/2);
 
     }else if (gravity>1.5) {
-        roll +=-3;
+        int gravityEffects = (int) NumberUtilities.squared(gravity);
+        roll +=gravityEffects;
         lifeform.addAttribute("G-Tolerance", 1,"The Lifeform is very tolerant towards acceleration forces");
-        lifeform.addAttribute(Attributes.STRENGTH);
-        lifeform.addAttribute(Attributes.CONSTITUTION);
-        lifeform.addAttribute(Attributes.FRAME,-3);
+        lifeform.addAttribute(Attributes.STRENGTH,(int) NumberUtilities.sqrt((double) gravityEffects));
+        lifeform.addAttribute(Attributes.CONSTITUTION, gravityEffects/2);
+        lifeform.addAttribute(Attributes.FRAME,gravityEffects);
     }
 
-    if(roll<6) lifeform.addAttribute("Acceleration Weakness", "XXX");
-    else if(roll>16) lifeform.addAttribute("Space Sickness","XXX");
-    else if(roll>14) lifeform.addAttribute("Acceleration Tolerance","XXX");
-
-        String choice =TableMaker.makeRoll(
-                Dice._3d6()+bonus,
+        String choice = TableMaker.makeRoll(
+                roll,
                 new int[]{0, 7, 16, 17},
                 new String[]{"Acceleration Weakness","None", "Space Sickness","Acceleration Tolerance"}
         );
 
+        switch (choice){
+            case "Acceleration Weakness":
+                lifeform.addAttribute("Acceleration Weakness", "The lifeform is sensitive to G-forces and may blackout or hemmorage at a much lower threshold than the average lifeform");
+                break;
+            case "Space Sickness":
+                lifeform.addAttribute("Space Sickness","The balance organs of the lifeform has a difficult time to handle free-fall and micro gravity, probably suffering from debilitating nausea");
+                break;
+            case "Acceleration Tolerance":
+                lifeform.addAttribute("Acceleration Tolerance","The lifeform is resistance to G-forces and may blackout or hemmorage at a much higher threshold than the average lifeform");
+                break;
+            default:
+                break;
+        }
 }
 
     private static void decideMetabolism(Sophont lifeform) {

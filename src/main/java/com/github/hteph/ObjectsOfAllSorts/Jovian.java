@@ -15,7 +15,7 @@ public class Jovian extends OrbitalObjects {
 	private static final long serialVersionUID = 1L;
 
 	private int radius;
-	private int mass;
+	private BigDecimal mass;
 	private double orbitalPeriod; //in earth years
 	private double axialTilt;
 	private double eccentricity;
@@ -41,12 +41,12 @@ public class Jovian extends OrbitalObjects {
 
 		@Override
 	public String toString() {
-		return name + ", Mass = "+mass;
+		return name + ", Mass = " + mass;
 	}
 
 	// Getters and Setters -------------------------------------
 	public double getMass() {
-		return mass;
+		return mass.doubleValue();
 	}
 
 	public int getRadius() {
@@ -123,8 +123,7 @@ public class Jovian extends OrbitalObjects {
 
 
 	public void setMass(double mass) {
-		this.mass = (int) mass;
-		
+		this.mass = BigDecimal.valueOf(mass).setScale(3,BigDecimal.ROUND_HALF_UP);
 	}
 
 	public String getClassificationName() {
@@ -137,10 +136,6 @@ public class Jovian extends OrbitalObjects {
 
 	public void setLunarObjects(ArrayList<StellarObject> lunarObjects) {
 		this.lunarObjects = lunarObjects;
-	}
-
-	public void setMass(int mass) {
-		this.mass = mass;
 	}
 
 	public void setClassificationName(String classificationName) {
