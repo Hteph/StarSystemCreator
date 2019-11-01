@@ -20,7 +20,6 @@ public class Planet extends OrbitalObjects {
     private BigDecimal density;
     private BigDecimal orbitalPeriod;
     private BigDecimal axialTilt;
-    private BigDecimal eccentricity;
     private boolean tidelocked;
     private BigDecimal rotationalPeriod;
     private String tectonicCore;
@@ -48,50 +47,46 @@ public class Planet extends OrbitalObjects {
     private Breathing lifeType;
 
     // Constructor ----------------------------------------------
-    public Planet(String archiveID, String name, String description, String classificationName, BigDecimal orbitDistance, StellarObject orbitingAround) {
-        super(archiveID, name, description, orbitDistance, orbitingAround);
-        this.classificationName = classificationName;
-    }
+
 
     public Planet(Builder builder) {
-        super(builder.archiveID, name, description, orbitDistanceStar, orbitingAround);
-        this.mass = mass;
-        this.radius = radius;
-        this.gravity = gravity;
-        this.density = density;
-        this.orbitalPeriod = orbitalPeriod;
-        this.axialTilt = axialTilt;
-        this.eccentricity = eccentricity;
-        this.tidelocked = tidelocked;
-        this.rotationalPeriod = rotationalPeriod;
-        this.tectonicCore = tectonicCore;
-        this.magneticField = magneticField;
-        this.hydrosphereDescription = hydrosphereDescription;
-        this.hydrosphere = hydrosphere;
-        this.atmosphericComposition = atmosphericComposition;
-        this.atmoPressure = atmoPressure;
-        this.surfaceTemp = surfaceTemp;
-        this.rangeBandTemperature = rangeBandTemperature;
-        this.rangeBandTempSummer = rangeBandTempSummer;
-        this.rangeBandTempWinter = rangeBandTempWinter;
-        this.nightTempMod = nightTempMod;
-        this.dayTempMod = dayTempMod;
-        this.tectonicActivityGroup = tectonicActivityGroup;
-        this.orbitalInclination = orbitalInclination;
-        this.boilingAtmo = boilingAtmo;
-        this.moonList = moonList;
-        this.lunarTidal = lunarTidal;
-        this.planetLocked = planetLocked;
-        this.lunarOrbitalPeriod = lunarOrbitalPeriod;
-        this.classificationName = classificationName;
-        this.lifeType = lifeType;
+        super(builder.archiveID, builder.name, builder.description, builder.orbitDistanceStar, builder.orbitingAround, builder.eccentricity, builder.orbitalObjectClass);
+        this.mass = builder.mass;
+        this.radius = builder.radius;
+        this.gravity = builder.gravity;
+        this.density = builder.density;
+        this.orbitalPeriod = builder.orbitalPeriod;
+        this.axialTilt = builder.axialTilt;
+        this.tidelocked = builder.tidelocked;
+        this.rotationalPeriod = builder.rotationalPeriod;
+        this.tectonicCore = builder.tectonicCore;
+        this.magneticField = builder.magneticField;
+        this.hydrosphereDescription = builder.hydrosphereDescription;
+        this.hydrosphere = builder.hydrosphere;
+        this.atmosphericComposition = builder.atmosphericComposition;
+        this.atmoPressure = builder.atmoPressure;
+        this.surfaceTemp = builder.surfaceTemp;
+        this.rangeBandTemperature = builder.rangeBandTemperature;
+        this.rangeBandTempSummer = builder.rangeBandTempSummer;
+        this.rangeBandTempWinter = builder.rangeBandTempWinter;
+        this.nightTempMod = builder.nightTempMod;
+        this.dayTempMod = builder.dayTempMod;
+        this.tectonicActivityGroup = builder.tectonicActivityGroup;
+        this.orbitalInclination = builder.orbitalInclination;
+        this.boilingAtmo = builder.boilingAtmo;
+        this.moonList = builder.moonList;
+        this.lunarTidal = builder.lunarTidal;
+        this.planetLocked = builder.planetLocked;
+        this.lunarOrbitalPeriod = builder.lunarOrbitalPeriod;
+        this.classificationName = builder.classificationName;
+        this.lifeType = builder.lifeType;
     }
 
     //Methods --------------------------------------------------
 
     @Override
     public String toString() {
-        return "Planet " + name + ": " + description + ", radius=" + radius
+        return "Planet " + super.getName() + ": " + super.getDescription() + ", radius=" + radius
                        + ", hydrosphereDescription=" + hydrosphereDescription + ", hydro%=" + hydrosphere + ", pressure="
                        + atmoPressure + ",\n surfaceTemp=" + surfaceTemp + ", lifeType=" + lifeType + "\n Atmo" + atmosphericComposition.toString();
     }
@@ -156,15 +151,11 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setAxialTilt(double axialTilt) {
-        this.axialTilt = BigDecimal.valueOf(axialTilt).setScale(3);
+        this.axialTilt = BigDecimal.valueOf(axialTilt).setScale(3,RoundingMode.HALF_UP);
     }
 
     public BigDecimal getEccentricity() {
-        return eccentricity;
-    }
-
-    public void setEccentricity(double eccentricity) {
-        this.eccentricity = BigDecimal.valueOf(eccentricity).setScale(3);
+        return super.getOrbitaleccentricity();
     }
 
     public boolean isTidelocked() {
@@ -392,13 +383,25 @@ public class Planet extends OrbitalObjects {
 
     public static final class Builder {
 
+        //super.super
+        protected String name;
+        protected String description;
+        protected String archiveID;
+
+        //super
+        private BigDecimal orbitDistanceStar;
+        private StellarObject orbitingAround;
+        private BigDecimal eccentricity;
+        private char orbitalObjectClass;
+        private BigDecimal localOrbitDistance;
+
+        //this
         private BigDecimal mass;
         private int radius;
         private BigDecimal gravity;
         private BigDecimal density;
         private BigDecimal orbitalPeriod;
         private BigDecimal axialTilt;
-        private BigDecimal eccentricity;
         private boolean tidelocked;
         private BigDecimal rotationalPeriod;
         private String tectonicCore;
@@ -572,6 +575,31 @@ public class Planet extends OrbitalObjects {
 
         public Builder withLifeType(Breathing lifeType) {
             this.lifeType = lifeType;
+            return this;
+        }
+
+        public Builder withOrbitDistanceStar(BigDecimal orbitDistanceStar) {
+            this.orbitDistanceStar = orbitDistanceStar;
+            return this;
+        }
+
+        public Builder withOrbitingAround(StellarObject orbitingAround) {
+            this.orbitingAround = orbitingAround;
+            return this;
+        }
+
+        public Builder withOrbitaleccentricity(double orbitaleccentricity) {
+            this.orbitaleccentricity = orbitaleccentricity;
+            return this;
+        }
+
+        public Builder withOrbitalObjectClass(char orbitalObjectClass) {
+            this.orbitalObjectClass = orbitalObjectClass;
+            return this;
+        }
+
+        public Builder withLocalOrbitDistance(BigDecimal localOrbitDistance) {
+            this.localOrbitDistance = localOrbitDistance;
             return this;
         }
 

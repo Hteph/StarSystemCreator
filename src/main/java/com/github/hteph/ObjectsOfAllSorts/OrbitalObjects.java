@@ -10,17 +10,19 @@ public class OrbitalObjects extends StellarObject {
 	private static final long serialVersionUID = 1L;
 	private BigDecimal orbitDistanceStar;
 	private StellarObject orbitingAround;
-	private double orbitaleccentricity;
+	private BigDecimal orbitaleccentricity;
 	private char orbitalObjectClass;
 	private BigDecimal localOrbitDistance;
 		
 	//Constructor ----------------------------------------------------
 	
 
-	public OrbitalObjects(String archiveID, String name, String description, BigDecimal orbitDistanceStar, StellarObject orbitingAround) {
+	public OrbitalObjects(String archiveID, String name, String description, BigDecimal orbitDistanceStar, StellarObject orbitingAround, BigDecimal eccentricity, char orbitalObjectClass) {
 		super(name, description, archiveID);
 		this.orbitDistanceStar = orbitDistanceStar;
 		this.orbitingAround =orbitingAround;
+		this.orbitaleccentricity = eccentricity;
+		this.orbitalObjectClass = orbitalObjectClass;
 	}
 	public BigDecimal getLocalOrbitDistance() {
 		return localOrbitDistance;
@@ -33,7 +35,7 @@ public class OrbitalObjects extends StellarObject {
 		return orbitDistanceStar;
 	}
 
-	public double getOrbitaleccentricity() {
+	public BigDecimal getOrbitaleccentricity() {
 		return orbitaleccentricity;
 	}
 
