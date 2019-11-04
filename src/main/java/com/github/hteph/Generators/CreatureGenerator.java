@@ -29,7 +29,6 @@ public class CreatureGenerator {
         EnvironmentalAttributesTable.environmentalAttributes(lifeform, baseEnvironment);
         decideMetabolism(lifeform);
         gravityEffects(lifeform);
-
         basicBodyShape(lifeform);
 
         return lifeform;

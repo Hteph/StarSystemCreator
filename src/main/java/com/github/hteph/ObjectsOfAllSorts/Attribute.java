@@ -44,6 +44,7 @@ public class Attribute {
     }
 	
 	public Attribute decreaseLevel() {
+
 		this.level--;
         return this;
     }

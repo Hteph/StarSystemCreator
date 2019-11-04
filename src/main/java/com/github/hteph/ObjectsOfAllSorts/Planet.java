@@ -26,19 +26,19 @@ public class Planet extends OrbitalObjects {
     private BigDecimal magneticField;
     private HydrosphereDescription hydrosphereDescription;
     private int hydrosphere;
-    private Set<AtmosphericGases> atmosphericComposition = new TreeSet<>(new AtmosphericGases.atmoCompositionComparator());
+    private Set<AtmosphericGases> atmosphericComposition;
     private BigDecimal atmoPressure;
     private int surfaceTemp;
-    private int[] rangeBandTemperature = new int[10];
-    private int[] rangeBandTempSummer = new int[10];
-    private int[] rangeBandTempWinter = new int[10];
+    private int[] rangeBandTemperature;
+    private int[] rangeBandTempSummer;
+    private int[] rangeBandTempWinter;
     private BigDecimal nightTempMod;
     private BigDecimal dayTempMod;
     private String tectonicActivityGroup;
     private BigDecimal orbitalInclination;
     private boolean boilingAtmo;
     //private Set<StellarObject> lunarObjects = new TreeSet<>(new lunarObjectDistanceComparator());
-    private ArrayList<String> moonList = new ArrayList<>();
+    private ArrayList<String> moonList;
     private BigDecimal lunarTidal;
     private boolean planetLocked;
     private BigDecimal lunarOrbitalPeriod;
@@ -589,7 +589,7 @@ public class Planet extends OrbitalObjects {
         }
 
         public Builder withOrbitaleccentricity(double orbitaleccentricity) {
-            this.orbitaleccentricity = orbitaleccentricity;
+            this.eccentricity = BigDecimal.valueOf(orbitaleccentricity).setScale(3,RoundingMode.HALF_UP);
             return this;
         }
 

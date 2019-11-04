@@ -36,7 +36,7 @@ public class Sophont implements Serializable {
 			this.name = place.getName().substring(0,1+place.getName().length()/2)+"ians";
 			e.printStackTrace();
 		}
-		this.homeworld=place.archiveID;
+		this.homeworld=place.getArchiveID();
 	}
 	
 	//Getters and Setter --------------------------------------
@@ -90,8 +90,8 @@ public class Sophont implements Serializable {
         }
 		else if (extras<0){
 		    attribute = new Attribute(name, description);
-			attributes.put(name, attribute).decreaseLevel();//Compensating for the first "free" level.
-			for(int i=0;i>extras;i--) attribute.decreaseLevel();
+			attributes.put(name, attribute);
+			for(int i=0;i>extras-1;i--) attribute.decreaseLevel();//Compensating for the first "free" level.
 		}else{
             attribute = new Attribute(name, description);
             attributes.put(name, attribute);
@@ -179,7 +179,6 @@ public class Sophont implements Serializable {
                 "description= " + description + "\n" +
                 "homeworld= " + CentralRegistry.getFromArchive(homeworld).getName() + "\n" +
                 "attributes= " + attributeDesc.toString() +
-
                 "----------------";
     }
 }
