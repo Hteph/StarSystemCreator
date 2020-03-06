@@ -1,4 +1,4 @@
-package com.github.hteph.Utilities;
+package com.github.hteph.Utilities.comparators;
 
 import java.io.Serializable;
 import java.util.Comparator;

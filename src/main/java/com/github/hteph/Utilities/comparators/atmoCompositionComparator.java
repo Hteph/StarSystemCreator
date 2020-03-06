@@ -1,4 +1,4 @@
-package com.github.hteph.Utilities;
+package com.github.hteph.Utilities.comparators;
 
 import com.github.hteph.ObjectsOfAllSorts.AtmosphericGases;
 

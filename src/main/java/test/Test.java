@@ -19,7 +19,7 @@ public class Test {
 		
 		BigDecimal[] orbitalDistancesArray = {BigDecimal.valueOf(1.0), BigDecimal.valueOf(2.0)};
 		
-		AsteroidBelt belt = (AsteroidBelt) GenerateAsteroidBelt.Generator("Test", "Test", "Test", 1, (Star) star, orbitalObjectBasicList, orbitalDistancesArray);
+		AsteroidBelt belt = (AsteroidBelt) GenerateAsteroidBelt.generator("Test", "Test", "Test", 1, (Star) star, orbitalObjectBasicList, orbitalDistancesArray);
 
 		System.out.println(belt.toString());
 

@@ -2,7 +2,7 @@ package com.github.hteph.ObjectsOfAllSorts;
 
 import com.github.hteph.Utilities.enums.Breathing;
 import com.github.hteph.Utilities.enums.HydrosphereDescription;
-import com.github.hteph.Utilities.lunarObjectDistanceComparator;
+import com.github.hteph.Utilities.comparators.lunarObjectDistanceComparator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

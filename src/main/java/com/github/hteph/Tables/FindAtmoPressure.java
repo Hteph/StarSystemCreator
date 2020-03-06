@@ -4,6 +4,7 @@ import com.github.hteph.ObjectsOfAllSorts.AtmosphericGases;
 import com.github.hteph.Utilities.Dice;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Set;
 
 public class FindAtmoPressure {
@@ -60,6 +61,6 @@ public class FindAtmoPressure {
         }
         if (atmoshericComposition.isEmpty()) pressure = 0;
         pressure *= mass;
-        return BigDecimal.valueOf(pressure).setScale(4, BigDecimal.ROUND_HALF_UP);
+        return BigDecimal.valueOf(pressure).setScale(4, RoundingMode.HALF_UP);
     }
 }
