@@ -22,7 +22,7 @@ public final class GenerateAsteroidBelt {
     }
 
 
-    public static OrbitalObjects Generator(String archiveID, String name, String description, TempOrbitalObject tempObject, Star orbitingAround, TreeSet<TempOrbitalObject> tempOrbitalObjects) {
+    public static OrbitalObjects generator(String archiveID, String name, String description, TempOrbitalObject tempObject, Star orbitingAround, TreeSet<TempOrbitalObject> tempOrbitalObjects) {
 
         boolean outerZone = false;
 

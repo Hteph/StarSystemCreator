@@ -17,10 +17,11 @@ public class GenerateMoon {
 
         double[] lunarOrbitDistance = new double[number];
 
-        lunarOrbitDistance[0] = 3 + 150 / number * (Dice._2d6() - 2) / 10.0; //in planet Radii
+        lunarOrbitDistance[0] = 3 + 150 / (1.0 * number) * (Dice._2d6() - 2) / 10.0; //in planet Radii
 
-        for (int i = 1; i < number; i++) lunarOrbitDistance[i] = lunarOrbitDistance[i - 1] + 1 + 150 / number * (Dice._2d6() - 2) / 10.0;
+        for (int i = 1; i < number; i++) lunarOrbitDistance[i] = lunarOrbitDistance[i - 1] + 1 + 150 / (1.0 *number) * (Dice._2d6() - 2) / 10.0;
 
+        double startDistance = 3 + 150 / (1.0 * number) * (Dice._2d6() - 2) / 10.0;
 
         for (int i = 0; i < number; i++) {
 

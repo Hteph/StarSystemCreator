@@ -29,28 +29,20 @@ public class Jovian extends OrbitalObjects {
 	private Breathing lifeType;
 	private ArrayList<StellarObject> lunarObjects;
 
-	private BigDecimal orbitDistanceStar;
-	private StellarObject orbitingAround;
-	private BigDecimal orbitaleccentricity;
-	private char orbitalObjectClass;
-	private BigDecimal localOrbitDistance;
-
-	private String name;
-
-	private String description;
-
-	private String archiveID;
-
-	
-	// Constructor ----------------------------------------------
-
-	public Jovian(String archiveID, String name, String description, String classificationName, BigDecimal orbitDistance, StellarObject orbitingAround, double eccentricity, char type) {
-		super(archiveID, name, description, orbitDistance, orbitingAround, BigDecimal.valueOf(eccentricity), type);
-		this.classificationName =classificationName;
-	}
-
 	public Jovian(Builder builder) {
 
+		super(builder.archiveID, builder.name, builder.description, builder.orbitDistanceStar, builder.orbitingAround, builder.orbitaleccentricity, builder.orbitalObjectClass);
+		this.radius = builder.radius;
+		this.mass = builder.mass;
+		this.orbitalPeriod = builder.orbitalPeriod;
+		this.axialTilt = builder.axialTilt;
+		this.classificationName = builder.classificationName;
+		this.rotationalPeriod = builder.rotationalPeriod;
+		this.magneticField = builder.magneticField;
+		this.baseTemperature = builder.baseTemperature;
+		this.orbitalInclination = builder.orbitalInclination;
+		this.lifeType = builder.lifeType;
+		this.lunarObjects = builder.lunarObjects;
 	}
 
 	@Override
@@ -147,8 +139,8 @@ public class Jovian extends OrbitalObjects {
 		this.classificationName = classificationName;
 	}
 
-	public static Planet.Builder builder() {
-		return new Planet.Builder();
+	public static Jovian.Builder builder() {
+		return new Jovian.Builder();
 	}
 
 	public static final class Builder {
@@ -172,7 +164,6 @@ public class Jovian extends OrbitalObjects {
 		private StellarObject orbitingAround;
 		private BigDecimal orbitaleccentricity;
 		private char orbitalObjectClass;
-		private BigDecimal localOrbitDistance;
 
 		private String name;
 
@@ -201,12 +192,6 @@ public class Jovian extends OrbitalObjects {
 
 		public Builder withOrbitalObjectClass(char orbitalObjectClass) {
 			this.orbitalObjectClass = orbitalObjectClass;
-			return this;
-		}
-
-
-		public Builder withLocalOrbitDistance(BigDecimal localOrbitDistance) {
-			this.localOrbitDistance = localOrbitDistance;
 			return this;
 		}
 
