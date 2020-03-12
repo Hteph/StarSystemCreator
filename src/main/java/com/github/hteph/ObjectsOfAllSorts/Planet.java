@@ -7,6 +7,7 @@ import com.github.hteph.Utilities.comparators.lunarObjectDistanceComparator;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -37,12 +38,11 @@ public class Planet extends OrbitalObjects {
     private String tectonicActivityGroup;
     private BigDecimal orbitalInclination;
     private boolean boilingAtmo;
-    //private Set<StellarObject> lunarObjects = new TreeSet<>(new lunarObjectDistanceComparator());
-    private ArrayList<String> moonList;
+    private List<String> moonList;
     private BigDecimal lunarTidal;
     private boolean planetLocked;
     private BigDecimal lunarOrbitalPeriod;
-    //	private BigDecimal lunarOrbitDistance; //in planetRadii
+    private BigDecimal lunarOrbitDistance; //in planetRadii
     private String classificationName;
     private Breathing lifeType;
 
@@ -50,7 +50,13 @@ public class Planet extends OrbitalObjects {
 
 
     public Planet(Builder builder) {
-        super(builder.archiveID, builder.name, builder.description, builder.orbitDistanceStar, builder.orbitingAround, builder.eccentricity, builder.orbitalObjectClass);
+        super(builder.archiveID,
+              builder.name,
+              builder.description,
+              builder.orbitDistanceStar,
+              builder.orbitingAround,
+              builder.eccentricity,
+              builder.orbitalObjectClass);
         this.mass = builder.mass;
         this.radius = builder.radius;
         this.gravity = builder.gravity;
@@ -80,6 +86,7 @@ public class Planet extends OrbitalObjects {
         this.lunarOrbitalPeriod = builder.lunarOrbitalPeriod;
         this.classificationName = builder.classificationName;
         this.lifeType = builder.lifeType;
+        this.lunarOrbitDistance = builder.localOrbitDistance;
     }
 
     //Methods --------------------------------------------------
@@ -111,7 +118,7 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setMass(double mass) {
-        this.mass = BigDecimal.valueOf(mass).setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.mass = BigDecimal.valueOf(mass).setScale(3, RoundingMode.HALF_UP);
     }
 
     public int getRadius() {
@@ -127,7 +134,7 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setGravity(double gravity) {
-        this.gravity = BigDecimal.valueOf(gravity).setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.gravity = BigDecimal.valueOf(gravity).setScale(3, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getDensity() {
@@ -135,7 +142,7 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setDensity(double density) {
-        this.density = BigDecimal.valueOf(density).setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.density = BigDecimal.valueOf(density).setScale(3, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getOrbitalPeriod() {
@@ -143,7 +150,7 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setOrbitalPeriod(double orbitalPeriod) {
-        this.orbitalPeriod = BigDecimal.valueOf(orbitalPeriod).setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.orbitalPeriod = BigDecimal.valueOf(orbitalPeriod).setScale(3, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getAxialTilt() {
@@ -171,7 +178,7 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setRotationalPeriod(double rotationalPeriod) {
-        this.rotationalPeriod = BigDecimal.valueOf(rotationalPeriod).setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.rotationalPeriod = BigDecimal.valueOf(rotationalPeriod).setScale(3, RoundingMode.HALF_UP);
     }
 
     public String getTectonicCore() {
@@ -187,7 +194,7 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setMagneticField(double magneticField) {
-        this.magneticField = BigDecimal.valueOf(magneticField).setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.magneticField = BigDecimal.valueOf(magneticField).setScale(3, RoundingMode.HALF_UP);
     }
 
     public HydrosphereDescription getHydrosphereDescription() {
@@ -289,7 +296,7 @@ public class Planet extends OrbitalObjects {
     }
 
     public void setOrbitalInclination(double orbitalInclination) {
-        this.orbitalInclination = BigDecimal.valueOf(orbitalInclination).setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.orbitalInclination = BigDecimal.valueOf(orbitalInclination).setScale(3, RoundingMode.HALF_UP);
     }
 
     public Breathing getLifeType() {
@@ -334,48 +341,46 @@ public class Planet extends OrbitalObjects {
 
     public BigDecimal getLunarOrbitalPeriod() {
 
-        if (lunarOrbitalPeriod == null) return BigDecimal.valueOf(-1);
-
-        return lunarOrbitalPeriod;
+        return (lunarOrbitalPeriod == null) ? BigDecimal.valueOf(-1) : lunarOrbitalPeriod;
     }
 
     public void setLunarOrbitalPeriod(Double lunarOrbitalPeriod) {
         if (lunarOrbitalPeriod != null) this.lunarOrbitalPeriod = BigDecimal.valueOf(lunarOrbitalPeriod).setScale(3, RoundingMode.HALF_UP);
     }
 
-    public void addLunarObjects(OrbitalObjects lunarObject) {
-
-        final int ASCII_STARTING_NUMBER = 97;
-        final int ASCII_ENDING_NUMBER = 122;
-
-        Set<OrbitalObjects> objectList = new TreeSet<>(new lunarObjectDistanceComparator());
-
-        for (String moonID : moonList) objectList.add((OrbitalObjects) CentralRegistry.getAndRemoveFromArchive(moonID));
-        wipeMoons();
-        objectList.add(lunarObject);
-
-        char asciiNumber = ASCII_STARTING_NUMBER;
-        for (OrbitalObjects moon : objectList) {
-
-            String moonID = moon.getOrbitingAround().getArchiveID()
-                                    + "."
-                                    + asciiNumber
-                                    + moon.getLocalOrbitDistance();
-            moonList.add(moonID);
-            moon.setArchiveID(moonID);
-            CentralRegistry.putInArchive(moon);
-            asciiNumber++;
-            if (asciiNumber > ASCII_ENDING_NUMBER) asciiNumber = ASCII_STARTING_NUMBER;
-        }
-    }
-
-//	public BigDecimal getLunarOrbitDistance() {
-//		return localOrbitDistance;
-//	}
+//    public void addLunarObjects(OrbitalObjects newLunarObject) {
 //
-//	public void setLunarOrbitDistance(double lunarOrbitDistance) {
-//		this.localOrbitDistance = BigDecimal.valueOf(lunarOrbitDistance).setScale(3, RoundingMode.HALF_UP);
-//	}
+//        final int ASCII_STARTING_NUMBER = 97;
+//        final int ASCII_ENDING_NUMBER = 122;
+//
+//        Set<OrbitalObjects> objectList = new TreeSet<>(new lunarObjectDistanceComparator());
+//
+//        for (String moonID : moonList) objectList.add((OrbitalObjects) CentralRegistry.getAndRemoveFromArchive(moonID));
+//        wipeMoons();
+//        objectList.add(newLunarObject);
+//
+//        char asciiNumber = ASCII_STARTING_NUMBER;
+//        for (OrbitalObjects moon : objectList) {
+//
+//            String moonID = moon.getOrbitingAround().getArchiveID()
+//                                    + "."
+//                                    + asciiNumber
+//                                    + moon.getLocalOrbitDistance();
+//            moonList.add(moonID);
+//            moon.setArchiveID(moonID);
+//            CentralRegistry.putInArchive(moon);
+//            asciiNumber++;
+//            if (asciiNumber > ASCII_ENDING_NUMBER) asciiNumber = ASCII_STARTING_NUMBER;
+//        }
+//    }
+
+	public BigDecimal getLunarOrbitDistance() {
+		return lunarOrbitDistance;
+	}
+
+	public void setLunarOrbitDistance(double lunarOrbitDistance) {
+		this.lunarOrbitDistance = BigDecimal.valueOf(lunarOrbitDistance).setScale(3, RoundingMode.HALF_UP);
+	}
 
     public static Builder builder() {
         return new Builder();
@@ -390,7 +395,7 @@ public class Planet extends OrbitalObjects {
 
         //super
         private BigDecimal orbitDistanceStar;
-        private StellarObject orbitingAround;
+        private String orbitingAround;
         private BigDecimal eccentricity;
         private char orbitalObjectClass;
         private BigDecimal localOrbitDistance;
@@ -420,13 +425,53 @@ public class Planet extends OrbitalObjects {
         private BigDecimal orbitalInclination;
         private boolean boilingAtmo;
         //private Set<StellarObject> lunarObjects = new TreeSet<>(new lunarObjectDistanceComparator());
-        private ArrayList<String> moonList = new ArrayList<>();
+        private List<String> moonList;
         private BigDecimal lunarTidal;
         private boolean planetLocked;
         private BigDecimal lunarOrbitalPeriod;
         //	private BigDecimal lunarOrbitDistance; //in planetRadii
         private String classificationName;
         private Breathing lifeType;
+
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder withArchiveID(String archiveID) {
+            this.archiveID = archiveID;
+            return this;
+        }
+
+        public Builder withOrbitDistanceStar(BigDecimal orbitDistanceStar) {
+            this.orbitDistanceStar = orbitDistanceStar;
+            return this;
+        }
+
+        public Builder withOrbitingAround(String orbitingAround) {
+            this.orbitingAround = orbitingAround;
+            return this;
+        }
+
+        public Builder withEccentricity(BigDecimal eccentricity) {
+            this.eccentricity = eccentricity;
+            return this;
+        }
+
+        public Builder withOrbitalObjectClass(char orbitalObjectClass) {
+            this.orbitalObjectClass = orbitalObjectClass;
+            return this;
+        }
+
+        public Builder withLocalOrbitDistance(BigDecimal localOrbitDistance) {
+            this.localOrbitDistance = localOrbitDistance;
+            return this;
+        }
 
         public Builder withMass(BigDecimal mass) {
             this.mass = mass;
@@ -455,11 +500,6 @@ public class Planet extends OrbitalObjects {
 
         public Builder withAxialTilt(BigDecimal axialTilt) {
             this.axialTilt = axialTilt;
-            return this;
-        }
-
-        public Builder withEccentricity(BigDecimal eccentricity) {
-            this.eccentricity = eccentricity;
             return this;
         }
 
@@ -548,7 +588,7 @@ public class Planet extends OrbitalObjects {
             return this;
         }
 
-        public Builder withMoonList(ArrayList<String> moonList) {
+        public Builder withMoonList(List<String> moonList) {
             this.moonList = moonList;
             return this;
         }
@@ -575,31 +615,6 @@ public class Planet extends OrbitalObjects {
 
         public Builder withLifeType(Breathing lifeType) {
             this.lifeType = lifeType;
-            return this;
-        }
-
-        public Builder withOrbitDistanceStar(BigDecimal orbitDistanceStar) {
-            this.orbitDistanceStar = orbitDistanceStar;
-            return this;
-        }
-
-        public Builder withOrbitingAround(StellarObject orbitingAround) {
-            this.orbitingAround = orbitingAround;
-            return this;
-        }
-
-        public Builder withOrbitaleccentricity(double orbitaleccentricity) {
-            this.eccentricity = BigDecimal.valueOf(orbitaleccentricity).setScale(3,RoundingMode.HALF_UP);
-            return this;
-        }
-
-        public Builder withOrbitalObjectClass(char orbitalObjectClass) {
-            this.orbitalObjectClass = orbitalObjectClass;
-            return this;
-        }
-
-        public Builder withLocalOrbitDistance(BigDecimal localOrbitDistance) {
-            this.localOrbitDistance = localOrbitDistance;
             return this;
         }
 

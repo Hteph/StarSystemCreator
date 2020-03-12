@@ -7,6 +7,21 @@
     <groupId>Hteph</groupId>
     <artifactId>StarViewer</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.codepoetics</groupId>
+            <artifactId>protonpack</artifactId>
+            <version>1.16</version>
+        </dependency>
+
+
+
+    </dependencies>
+
+
+
     <build>
         <plugins>
             <plugin>

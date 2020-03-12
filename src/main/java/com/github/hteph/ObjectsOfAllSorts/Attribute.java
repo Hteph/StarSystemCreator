@@ -83,14 +83,12 @@ public class Attribute {
             attributeDesc.append(entry.getValue().toString()).append("\n");
         }
 
-        final StringBuilder sb = new StringBuilder("Attributes")
-        .append("name= ").append(name).append("\n")
-        .append("description= ").append(description).append("\n")
-        .append("level= ").append(level).append("\n")
-        .append("conditions= ").append(attributeDesc.toString()).append("\n")
-        .append("-------------");
-
-        return sb.toString();
+		return "Attributes"
+							+ "name= " + name + "\n"
+							+ "description= " + description + "\n"
+							+ "level= " + level + "\n"
+							+ "conditions= " + attributeDesc.toString() + "\n"
+							+ "-------------";
     }
 
     public Attributes getEnumCode() {

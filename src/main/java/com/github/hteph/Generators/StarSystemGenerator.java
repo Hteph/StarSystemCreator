@@ -1,6 +1,5 @@
 package com.github.hteph.Generators;
 
-import com.github.hteph.ObjectsOfAllSorts.OrbitalObjects;
 import com.github.hteph.ObjectsOfAllSorts.Star;
 import com.github.hteph.ObjectsOfAllSorts.StellarObject;
 import com.github.hteph.ObjectsOfAllSorts.TempOrbitalObject;
@@ -53,7 +52,10 @@ public final class StarSystemGenerator {
         }
         tempOrbitalObjects.forEach(s -> setGeneralOrbitContent(INNER_LIMIT, SNOW_LINE, OUTER_LIMIT, s));
 
+        tempOrbitalObjects.stream()
+
         //Detailed bodies
+        //TODO This should be moved to a method
         int objectCounter = 1;
         int astroidBeltCounter = 1;
         for (TempOrbitalObject tempObject :tempOrbitalObjects) {
@@ -89,50 +91,50 @@ public final class StarSystemGenerator {
                 case 't':
                     classificationName = "Planetoid";
                     description = "Small and nicely rounded";
-                    star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID() + "." + numeral,
-                                                                               star.getName() + " " + numeral,
-                                                                               description, classificationName,
-                                                                               BigDecimal.valueOf(tempObject.getOrbitDistance()),
-                                                                               't',
-                                                                               star,
-                                                                               0));
+                    star.addOrbitalObjects(GenerateTerrestrialPlanet.generate(star.getArchiveID() + "." + numeral,
+                                                                              star.getName() + " " + numeral,
+                                                                              description, classificationName,
+                                                                              BigDecimal.valueOf(tempObject.getOrbitDistance()),
+                                                                              't',
+                                                                              star,
+                                                                              0));
                     objectCounter++;
                     break;
                 case 'T':
                     classificationName = "Terrestial";
                     description = "Large and round";
-                    star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID() + "." + numeral,
-                                                                               star.getName() + " " + numeral,
-                                                                               description, classificationName,
-                                                                               BigDecimal.valueOf(tempObject.getOrbitDistance()),
-                                                                               'T',
-                                                                               star,
-                                                                               0));
+                    star.addOrbitalObjects(GenerateTerrestrialPlanet.generate(star.getArchiveID() + "." + numeral,
+                                                                              star.getName() + " " + numeral,
+                                                                              description, classificationName,
+                                                                              BigDecimal.valueOf(tempObject.getOrbitDistance()),
+                                                                              'T',
+                                                                              star,
+                                                                              0));
                     objectCounter++;
                     break;
                 case 'C':
                     classificationName = "Catched Terrestial";
                     description = "Large and round, but from not originated in this system";
-                    star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID() + "." + numeral,
-                                                                               star.getName() + " " + numeral,
-                                                                               description, classificationName,
-                                                                               BigDecimal.valueOf(tempObject.getOrbitDistance()),
-                                                                               'C',
-                                                                               star,
-                                                                               0));
+                    star.addOrbitalObjects(GenerateTerrestrialPlanet.generate(star.getArchiveID() + "." + numeral,
+                                                                              star.getName() + " " + numeral,
+                                                                              description, classificationName,
+                                                                              BigDecimal.valueOf(tempObject.getOrbitDistance()),
+                                                                              'C',
+                                                                              star,
+                                                                              0));
                     objectCounter++;
                     break;
                 case 'c': //TODO this should use a special generator to allow for strange stuff as hulks, ancient
                     // stations etc etc
                     description = "Smaller than a planet, but not one of those asteroids, and not from here to start with";
-                    star.addOrbitalObjects(GenerateTerrestrialPlanet.Generator(star.getArchiveID() + "." + numeral,
-                                                                               star.getName() + " " + numeral,
-                                                                               description,
-                                                                               "Catched object",
-                                                                               BigDecimal.valueOf(tempObject.getOrbitDistance()),
-                                                                               'c',
-                                                                               star,
-                                                                               0));
+                    star.addOrbitalObjects(GenerateTerrestrialPlanet.generate(star.getArchiveID() + "." + numeral,
+                                                                              star.getName() + " " + numeral,
+                                                                              description,
+                                                                              "Catched object",
+                                                                              BigDecimal.valueOf(tempObject.getOrbitDistance()),
+                                                                              'c',
+                                                                              star,
+                                                                              0));
                     objectCounter++;
                     break;
                 case 'A':
@@ -185,26 +187,4 @@ public final class StarSystemGenerator {
 
     }
 
-    private static void getGeneralOrbitContent(double innerLimit, double snowLine, double outerLimit, BigDecimal[] orbitalDistancesArray, char[] orbitalObjectBasicList, int i) {
-
-        int[] outerNumbersList = {2, 3, 4, 5, 8, 11, 15, 17, 18};
-        Character[] outerObjectList = {'E', 'c', 'A', 'j', 'E', 't', 'T', 'C', 'J'};
-        int[] innerNumbersList = {2, 4, 8, 13, 14, 15, 17, 18};
-        Character[] innerObjectList = {'E', 'A', 't', 'T', 'C', 'E', 'j', 'J'};
-
-        if (orbitalDistancesArray[i].doubleValue() > outerLimit || orbitalDistancesArray[i].doubleValue() <
-                                                                           innerLimit) {
-            // Do nothing
-            orbitalObjectBasicList[i] = '+';
-
-        } else if (orbitalDistancesArray[i].doubleValue() < snowLine) {
-            if (orbitalObjectBasicList[i] == '-') orbitalObjectBasicList[i] = TableMaker.makeRoll(Dice._3d6(),
-                                                                                                  innerNumbersList,
-                                                                                                  innerObjectList);
-        } else {
-            if (orbitalObjectBasicList[i] == '-') orbitalObjectBasicList[i] = TableMaker.makeRoll(Dice._3d6(),
-                                                                                                  outerNumbersList,
-                                                                                                  outerObjectList);
-        }
-    }
 }

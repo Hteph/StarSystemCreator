@@ -12,14 +12,14 @@ public class CentralRegistry {
 
     private static Map<String, StellarObject> archive = new HashMap<>();
 
-    public static boolean putInArchive(StellarObject something){
+    public static String putInArchive(StellarObject something){
 
-        if(something.getArchiveID().isEmpty()) return false;
+        if(something.getArchiveID().isEmpty()) return null;
 
         //TODO more verification and such stuff are needed
 
         archive.put(something.getArchiveID(),something);
-        return true;
+        return something.getArchiveID();
 
     }
 

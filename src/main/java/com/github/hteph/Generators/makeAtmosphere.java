@@ -17,7 +17,7 @@ class makeAtmosphere {
                                                      String tectonicActivityGroup,
                                                      double radius,
                                                      double gravity,
-                                                     Planet planet) {
+                                                     Planet.Builder planet) {
         Set<String> makeAtmoshpere = new TreeSet<>();
         TreeSet<AtmosphericGases> atmoArray = new TreeSet<>(new AtmosphericGases.atmoCompositionComparator());
 
